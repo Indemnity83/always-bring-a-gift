@@ -14,7 +14,7 @@ class Dashboard extends Component
     public function getUpcomingEventsProperty(): Collection
     {
         $today = now()->startOfDay();
-        $endDate = now()->addDays(30);
+        $endDate = now()->addDays(90);
 
         return Event::with(['person', 'eventType', 'gifts', 'completions'])
             ->get()

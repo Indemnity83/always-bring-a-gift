@@ -18,8 +18,21 @@ class Person extends Model
      */
     protected $fillable = [
         'name',
+        'birthday',
         'notes',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'birthday' => 'date',
+        ];
+    }
 
     /**
      * Get the events for the person

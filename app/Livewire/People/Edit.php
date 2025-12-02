@@ -11,6 +11,8 @@ class Edit extends Component
 
     public string $name = '';
 
+    public ?string $birthday = null;
+
     public string $notes = '';
 
     /**
@@ -20,6 +22,7 @@ class Edit extends Component
     {
         $this->person = $person;
         $this->name = $person->name;
+        $this->birthday = $person->birthday?->format('Y-m-d');
         $this->notes = $person->notes ?? '';
     }
 
@@ -30,6 +33,7 @@ class Edit extends Component
     {
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
+            'birthday' => ['nullable', 'date', 'before_or_equal:today'],
             'notes' => ['nullable', 'string', 'max:5000'],
         ]);
 

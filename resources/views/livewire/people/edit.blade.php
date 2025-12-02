@@ -13,6 +13,8 @@
     <form wire:submit="update" class="max-w-2xl space-y-6">
         <flux:input wire:model="name" label="Name" placeholder="John Doe" required />
 
+        <flux:input wire:model="birthday" label="Birthday (Optional)" type="date" />
+
         <flux:textarea wire:model="notes" label="Notes" placeholder="Optional notes about this person..." rows="4" />
 
         <div class="flex gap-3">

@@ -23,6 +23,9 @@ class StorePersonRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'birthday' => ['nullable', 'date', 'before_or_equal:today'],
+            'create_birthday_event' => ['boolean'],
+            'create_christmas_event' => ['boolean'],
             'notes' => ['nullable', 'string', 'max:5000'],
         ];
     }

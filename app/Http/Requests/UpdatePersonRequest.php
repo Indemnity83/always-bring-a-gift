@@ -23,6 +23,7 @@ class UpdatePersonRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'birthday' => ['nullable', 'date', 'before_or_equal:today'],
             'notes' => ['nullable', 'string', 'max:5000'],
         ];
     }

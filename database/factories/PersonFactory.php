@@ -18,6 +18,7 @@ class PersonFactory extends Factory
     {
         return [
             'name' => fake()->name(),
+            'birthday' => fake()->optional()->date(),
             'notes' => fake()->optional()->sentence(),
         ];
     }

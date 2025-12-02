@@ -2,6 +2,9 @@
     <div class="flex items-center justify-between">
         <div>
             <flux:heading size="xl">{{ $person->name }}</flux:heading>
+            @if ($person->birthday)
+                <flux:subheading>Birthday: {{ $person->birthday->format('F j, Y') }}</flux:subheading>
+            @endif
             @if ($person->notes)
                 <flux:subheading>{{ $person->notes }}</flux:subheading>
             @endif

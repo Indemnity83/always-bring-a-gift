@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('notes')->nullable();
+            $table->date('birthday')->nullable()->after('name');
             $table->timestamps();
         });
     }
