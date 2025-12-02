@@ -52,6 +52,7 @@ class Create extends Component
                     'person_id' => $person->id,
                     'event_type_id' => $birthdayType->id,
                     'recurrence' => 'yearly',
+                    'show_milestone' => true,
                     'date' => $validated['birthday'],
                     'target_value' => $validated['birthday_target_value'] ?: null,
                 ]);

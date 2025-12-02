@@ -93,7 +93,7 @@
                                 wire:navigate
                                 class="text-sm {{ $isCompleted ? 'text-zinc-500 dark:text-zinc-500' : 'text-zinc-600 dark:text-zinc-400' }} no-underline hover:underline hover:{{ $isCompleted ? 'text-zinc-700 dark:text-zinc-300' : 'text-zinc-900 dark:text-zinc-100' }} transition-colors inline-block"
                             >
-                                {{ $event->eventType->name }} • {{ $event->next_occurrence->format('M j') }} ({{ $event->next_occurrence->diffForHumans() }})
+                                {{ $event->display_name }} • {{ $event->next_occurrence->format('M j') }} ({{ $event->next_occurrence->diffForHumans() }})
                             </a>
                         </div>
                         @if ($isCompleted)
@@ -206,7 +206,7 @@
                     @endphp
                     @if ($selectedEvent)
                         <flux:subheading>
-                            {{ $selectedEvent->eventType->name }} for {{ $selectedEvent->person->name }} ({{ $selectedEvent->next_occurrence_year }})
+                            {{ $selectedEvent->display_name }} for {{ $selectedEvent->person->name }} ({{ $selectedEvent->next_occurrence_year }})
                         </flux:subheading>
                     @endif
                 @endif

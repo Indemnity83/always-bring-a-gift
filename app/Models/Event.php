@@ -23,6 +23,7 @@ class Event extends Model
         'person_id',
         'event_type_id',
         'recurrence',
+        'show_milestone',
         'date',
         'target_value',
         'notes',
@@ -38,6 +39,7 @@ class Event extends Model
         return [
             'date' => 'date',
             'target_value' => 'decimal:2',
+            'show_milestone' => 'boolean',
         ];
     }
 
@@ -173,5 +175,61 @@ class Event extends Model
         $this->completions()
             ->where('year', $year)
             ->delete();
+    }
+
+    /**
+     * Get the milestone number for the next occurrence
+     * (e.g., 38 for a 38th birthday, 5 for a 5th anniversary)
+     */
+    protected function milestone(): Attribute
+    {
+        return Attribute::make(
+            get: function (): ?int {
+                // Only calculate milestone for yearly recurring events
+                if ($this->recurrence !== 'yearly') {
+                    return null;
+                }
+
+                // Calculate years since the original event date
+                return $this->next_occurrence_year - $this->date->year;
+            }
+        );
+    }
+
+    /**
+     * Get the display name with milestone number if applicable
+     * (e.g., "38th Birthday" instead of just "Birthday")
+     */
+    protected function displayName(): Attribute
+    {
+        return Attribute::make(
+            get: function (): string {
+                // Only show milestone if flag is enabled and milestone is greater than 0
+                if ($this->show_milestone && $this->milestone !== null && $this->milestone > 0) {
+                    return $this->ordinal($this->milestone).' '.$this->eventType->name;
+                }
+
+                return $this->eventType->name;
+            }
+        );
+    }
+
+    /**
+     * Convert a number to its ordinal form (1st, 2nd, 3rd, etc.)
+     */
+    protected function ordinal(int $number): string
+    {
+        $suffix = 'th';
+
+        if (! in_array($number % 100, [11, 12, 13])) {
+            $suffix = match ($number % 10) {
+                1 => 'st',
+                2 => 'nd',
+                3 => 'rd',
+                default => 'th',
+            };
+        }
+
+        return $number.$suffix;
     }
 }

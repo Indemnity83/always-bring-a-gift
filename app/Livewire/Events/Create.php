@@ -15,6 +15,8 @@ class Create extends Component
 
     public string $recurrence = 'none';
 
+    public bool $show_milestone = false;
+
     public string $date = '';
 
     public string $target_value = '';
@@ -38,6 +40,7 @@ class Create extends Component
         $validated = $this->validate([
             'event_type_id' => ['required', 'exists:event_types,id'],
             'recurrence' => ['required', 'in:none,yearly'],
+            'show_milestone' => ['boolean'],
             'date' => ['required', 'date'],
             'target_value' => ['nullable', 'numeric', 'min:0'],
             'notes' => ['nullable', 'string', 'max:5000'],
