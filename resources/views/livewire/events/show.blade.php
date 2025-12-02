@@ -71,7 +71,7 @@
                     <div class="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4 flex items-center gap-4 justify-between">
                         <div class="flex items-center gap-4 flex-1">
                             @if ($gift->image_path)
-                                <img src="{{ asset('storage/' . $gift->image_path) }}" alt="{{ $gift->title }}" class="h-16 w-16 object-cover rounded">
+                                <img src="{{ asset('storage/' . $gift->image_path) }}" alt="{{ $gift->title }}" class="h-16 w-16 object-contain rounded">
                             @endif
                             <div class="flex-1">
                                 <h4 class="font-medium text-zinc-900 dark:text-zinc-100">{{ $gift->title }}</h4>

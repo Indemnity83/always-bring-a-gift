@@ -34,7 +34,7 @@
                 @if ($gift->image_path)
                     <div class="text-sm text-zinc-600 dark:text-zinc-400">
                         Current image:
-                        <img src="{{ asset('storage/' . $gift->image_path) }}" alt="Current gift image" class="mt-2 h-20 w-20 object-cover rounded">
+                        <img src="{{ asset('storage/' . $gift->image_path) }}" alt="Current gift image" class="mt-2 h-20 w-20 object-contain rounded">
                     </div>
                 @endif
             </div>
