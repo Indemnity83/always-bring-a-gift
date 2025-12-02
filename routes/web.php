@@ -1,5 +1,7 @@
 <?php
 
+use App\Livewire\Dashboard;
+use App\Livewire\People;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -11,13 +13,29 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
+Route::get('dashboard', Dashboard::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
-    Route::redirect('settings', 'settings/profile');
+    // People routes
+    Route::get('people', People\Index::class)->name('people.index');
+    Route::get('people/create', People\Create::class)->name('people.create');
+    Route::get('people/{person}', People\Show::class)->name('people.show');
+    Route::get('people/{person}/edit', People\Edit::class)->name('people.edit');
 
+    // Event routes
+    Route::get('events/create/{person}', App\Livewire\Events\Create::class)->name('events.create');
+    Route::get('events/{event}', App\Livewire\Events\Show::class)->name('events.show');
+    Route::get('events/{event}/edit', App\Livewire\Events\Edit::class)->name('events.edit');
+    Route::get('past-events', App\Livewire\Events\Past::class)->name('events.past');
+
+    // Gift routes
+    Route::get('gifts/create/{event}/{year}', App\Livewire\Gifts\Create::class)->name('gifts.create');
+    Route::get('gifts/{gift}/edit', App\Livewire\Gifts\Edit::class)->name('gifts.edit');
+
+    // Settings routes
+    Route::redirect('settings', 'settings/profile');
     Route::get('settings/profile', Profile::class)->name('profile.edit');
     Route::get('settings/password', Password::class)->name('user-password.edit');
     Route::get('settings/appearance', Appearance::class)->name('appearance.edit');
