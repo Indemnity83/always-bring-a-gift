@@ -7,6 +7,21 @@
     <form wire:submit="save" class="max-w-2xl space-y-6">
         <flux:input wire:model="name" label="Name" placeholder="John Doe" required />
 
+        <div>
+            <flux:field>
+                <flux:label>Profile Picture (Optional)</flux:label>
+                <input type="file" wire:model="profile_picture" accept="image/*" class="block w-full text-sm text-zinc-900 dark:text-zinc-100 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-zinc-100 file:text-zinc-700 hover:file:bg-zinc-200 dark:file:bg-zinc-800 dark:file:text-zinc-300 dark:hover:file:bg-zinc-700">
+                @error('profile_picture')
+                    <flux:error>{{ $message }}</flux:error>
+                @enderror
+            </flux:field>
+            @if ($profile_picture)
+                <div class="mt-2">
+                    <img src="{{ $profile_picture->temporaryUrl() }}" alt="Preview" class="h-24 w-24 rounded-full object-cover">
+                </div>
+            @endif
+        </div>
+
         <flux:input wire:model="birthday" label="Birthday (Optional)" type="date" />
 
         <div class="space-y-4">

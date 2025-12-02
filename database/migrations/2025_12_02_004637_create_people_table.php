@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('people', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('profile_picture')->nullable();
+            $table->date('birthday')->nullable();
             $table->text('notes')->nullable();
-            $table->date('birthday')->nullable()->after('name');
             $table->timestamps();
         });
     }

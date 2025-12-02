@@ -6,10 +6,15 @@ use App\Models\Event;
 use App\Models\EventType;
 use App\Models\Person;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class Create extends Component
 {
+    use WithFileUploads;
+
     public string $name = '';
+
+    public $profile_picture = null;
 
     public ?string $birthday = null;
 
@@ -30,6 +35,7 @@ class Create extends Component
     {
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
+            'profile_picture' => ['nullable', 'image', 'max:2048'],
             'birthday' => ['nullable', 'date', 'before_or_equal:today'],
             'create_birthday_event' => ['boolean'],
             'birthday_target_value' => ['nullable', 'numeric', 'min:0'],
@@ -38,8 +44,14 @@ class Create extends Component
             'notes' => ['nullable', 'string', 'max:5000'],
         ]);
 
+        $profilePicturePath = null;
+        if ($this->profile_picture) {
+            $profilePicturePath = $this->profile_picture->store('profile-pictures', 'public');
+        }
+
         $person = Person::create([
             'name' => $validated['name'],
+            'profile_picture' => $profilePicturePath,
             'birthday' => $validated['birthday'],
             'notes' => $validated['notes'],
         ]);

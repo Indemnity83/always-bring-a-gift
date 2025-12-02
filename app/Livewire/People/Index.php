@@ -34,6 +34,7 @@ class Index extends Component
     {
         $people = Person::query()
             ->when($this->search, fn ($query) => $query->where('name', 'like', "%{$this->search}%"))
+            ->with(['events.eventType'])
             ->withCount('events')
             ->latest()
             ->paginate(15);

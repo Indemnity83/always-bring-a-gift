@@ -18,6 +18,7 @@ class Person extends Model
      */
     protected $fillable = [
         'name',
+        'profile_picture',
         'birthday',
         'notes',
     ];
