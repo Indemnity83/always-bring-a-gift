@@ -10,9 +10,10 @@ interface ImageExtractorInterface
     public function canHandle(string $url): bool;
 
     /**
-     * Extract an image URL from the HTML content
+     * Extract an image URL from the given URL
+     * The extractor is responsible for fetching any data it needs
      */
-    public function extractImageUrl(string $url, string $html): ?string;
+    public function extractImageUrl(string $url): ?string;
 
     /**
      * Get the priority of this extractor (higher = checked first)

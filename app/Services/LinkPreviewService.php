@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Services\ImageExtractors\AmazonImageExtractor;
 use App\Services\ImageExtractors\ImageExtractorInterface;
 use App\Services\ImageExtractors\MetaTagExtractor;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -36,41 +35,16 @@ class LinkPreviewService
     }
 
     /**
-     * Fetch an image from a URL using Open Graph or Twitter Card meta tags
+     * Fetch an image from a URL by dispatching to extractors
      */
     public function fetchImageFromUrl(string $url): ?string
     {
         try {
-            // Fetch the HTML content with a timeout and follow redirects
-            $response = Http::timeout(15)
-                ->withOptions([
-                    'allow_redirects' => [
-                        'max' => 10,
-                        'strict' => true,
-                        'track_redirects' => true,
-                    ],
-                ])
-                ->withHeaders([
-                    'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                ])
-                ->get($url);
-
-            if (! $response->successful()) {
-                Log::warning('Failed to fetch URL', [
-                    'url' => $url,
-                    'status' => $response->status(),
-                ]);
-
-                return null;
-            }
-
-            $html = $response->body();
-
             // Try each extractor in priority order
             $imageUrl = null;
             foreach ($this->extractors as $extractor) {
                 if ($extractor->canHandle($url)) {
-                    $imageUrl = $extractor->extractImageUrl($url, $html);
+                    $imageUrl = $extractor->extractImageUrl($url);
                     if ($imageUrl) {
                         Log::info('Found image URL using extractor', [
                             'extractor' => class_basename($extractor),
@@ -94,13 +68,6 @@ class LinkPreviewService
             // Download and store the image
             return $this->downloadAndStoreImage($imageUrl);
 
-        } catch (ConnectionException $e) {
-            Log::warning('Failed to fetch link preview', [
-                'url' => $url,
-                'error' => $e->getMessage(),
-            ]);
-
-            return null;
         } catch (\Exception $e) {
             Log::warning('Failed to process link preview', [
                 'url' => $url,

@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'openweb_ninja' => [
+        'key' => env('OPENWEB_NINJA_KEY'),
+    ],
+
 ];
