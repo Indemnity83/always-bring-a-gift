@@ -8,6 +8,8 @@ use App\Models\EventType;
 use App\Models\Gift;
 use App\Models\Person;
 use App\Models\User;
+use App\Services\LinkPreviewService;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -138,6 +140,47 @@ test('validates gift value is numeric', function () {
         ->set('giftValue', 'invalid')
         ->call('saveGift')
         ->assertHasErrors(['giftValue' => 'numeric']);
+});
+
+test('can add gift with link', function () {
+    $person = Person::factory()->create();
+    $eventType = EventType::factory()->create(['name' => 'Birthday']);
+    $event = Event::factory()->create([
+        'person_id' => $person->id,
+        'event_type_id' => $eventType->id,
+        'date' => now()->addDays(10),
+        'recurrence' => 'yearly',
+    ]);
+
+    Livewire::test(Dashboard::class)
+        ->call('openGiftModal', $event->id)
+        ->set('giftTitle', 'Test Gift')
+        ->set('giftLink', 'https://example.com/product')
+        ->call('saveGift')
+        ->assertHasNoErrors();
+
+    $gift = Gift::where('event_id', $event->id)->first();
+    expect($gift)
+        ->not->toBeNull()
+        ->and($gift->link)->toBe('https://example.com/product');
+});
+
+test('validates gift link is valid url', function () {
+    $person = Person::factory()->create();
+    $eventType = EventType::factory()->create(['name' => 'Birthday']);
+    $event = Event::factory()->create([
+        'person_id' => $person->id,
+        'event_type_id' => $eventType->id,
+        'date' => now()->addDays(10),
+        'recurrence' => 'yearly',
+    ]);
+
+    Livewire::test(Dashboard::class)
+        ->call('openGiftModal', $event->id)
+        ->set('giftTitle', 'Test Gift')
+        ->set('giftLink', 'not-a-url')
+        ->call('saveGift')
+        ->assertHasErrors(['giftLink' => 'url']);
 });
 
 test('can toggle event completion', function () {
@@ -310,4 +353,38 @@ test('filters events based on selected timeframe', function () {
     $component->call('setTimeframe', 180);
     $upcomingEvents = $component->get('upcomingEvents');
     expect($upcomingEvents)->toHaveCount(3);
+});
+
+test('auto-fetches image from link when no image uploaded', function () {
+    Storage::fake('public');
+
+    $person = Person::factory()->create();
+    $eventType = EventType::factory()->create(['name' => 'Birthday']);
+    $event = Event::factory()->create([
+        'person_id' => $person->id,
+        'event_type_id' => $eventType->id,
+        'date' => now()->addDays(10),
+        'recurrence' => 'yearly',
+    ]);
+
+    // Mock the LinkPreviewService
+    $this->mock(LinkPreviewService::class, function ($mock) {
+        $mock->shouldReceive('fetchImageFromUrl')
+            ->once()
+            ->with('https://example.com/product')
+            ->andReturn('gifts/fetched-image.jpg');
+    });
+
+    Livewire::test(Dashboard::class)
+        ->call('openGiftModal', $event->id)
+        ->set('giftTitle', 'Test Gift')
+        ->set('giftLink', 'https://example.com/product')
+        ->call('saveGift')
+        ->assertHasNoErrors();
+
+    $gift = Gift::where('event_id', $event->id)->first();
+    expect($gift)
+        ->not->toBeNull()
+        ->and($gift->link)->toBe('https://example.com/product')
+        ->and($gift->image_path)->toBe('gifts/fetched-image.jpg');
 });

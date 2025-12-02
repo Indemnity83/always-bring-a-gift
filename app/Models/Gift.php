@@ -20,6 +20,8 @@ class Gift extends Model
         'event_id',
         'title',
         'value',
+        'image_path',
+        'link',
         'year',
     ];
 

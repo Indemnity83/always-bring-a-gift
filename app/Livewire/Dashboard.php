@@ -4,12 +4,16 @@ namespace App\Livewire;
 
 use App\Models\Event;
 use App\Models\Gift;
+use App\Services\LinkPreviewService;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Session;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class Dashboard extends Component
 {
+    use WithFileUploads;
+
     public bool $showGiftModal = false;
 
     public ?int $selectedEventId = null;
@@ -17,6 +21,12 @@ class Dashboard extends Component
     public string $giftTitle = '';
 
     public string $giftValue = '';
+
+    public $giftImage = null;
+
+    public string $giftLink = '';
+
+    public bool $fetchImageFromLink = true;
 
     public int $timeframeDays = 30;
 
@@ -66,6 +76,9 @@ class Dashboard extends Component
         $this->selectedEventId = $eventId;
         $this->giftTitle = '';
         $this->giftValue = '';
+        $this->giftImage = null;
+        $this->giftLink = '';
+        $this->fetchImageFromLink = true;
         $this->showGiftModal = true;
     }
 
@@ -78,26 +91,41 @@ class Dashboard extends Component
         $this->selectedEventId = null;
         $this->giftTitle = '';
         $this->giftValue = '';
+        $this->giftImage = null;
+        $this->giftLink = '';
+        $this->fetchImageFromLink = true;
         $this->resetValidation();
     }
 
     /**
      * Save the gift
      */
-    public function saveGift(): void
+    public function saveGift(LinkPreviewService $linkPreviewService): void
     {
         $validated = $this->validate([
             'giftTitle' => ['required', 'string', 'max:255'],
             'giftValue' => ['nullable', 'numeric', 'min:0'],
+            'giftImage' => ['nullable', 'image', 'max:2048'],
+            'giftLink' => ['nullable', 'url', 'max:255'],
         ]);
 
         $event = Event::findOrFail($this->selectedEventId);
+
+        $imagePath = null;
+        if ($this->giftImage) {
+            $imagePath = $this->giftImage->store('gifts', 'public');
+        } elseif ($this->fetchImageFromLink && $validated['giftLink']) {
+            // Auto-fetch image from link if enabled and no image was uploaded
+            $imagePath = $linkPreviewService->fetchImageFromUrl($validated['giftLink']);
+        }
 
         Gift::create([
             'event_id' => $event->id,
             'year' => $event->next_occurrence_year,
             'title' => $validated['giftTitle'],
             'value' => $validated['giftValue'] ?: null,
+            'image_path' => $imagePath,
+            'link' => $validated['giftLink'] ?: null,
         ]);
 
         session()->flash('status', 'Gift added successfully.');

@@ -68,12 +68,23 @@
         @else
             <div class="space-y-3">
                 @foreach ($giftsThisYear as $gift)
-                    <div class="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4 flex items-center justify-between">
-                        <div>
-                            <h4 class="font-medium text-zinc-900 dark:text-zinc-100">{{ $gift->title }}</h4>
-                            @if ($gift->value)
-                                <p class="text-sm text-zinc-600 dark:text-zinc-400">${{ number_format($gift->value, 2) }}</p>
+                    <div class="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4 flex items-center gap-4 justify-between">
+                        <div class="flex items-center gap-4 flex-1">
+                            @if ($gift->image_path)
+                                <img src="{{ asset('storage/' . $gift->image_path) }}" alt="{{ $gift->title }}" class="h-16 w-16 object-cover rounded">
                             @endif
+                            <div class="flex-1">
+                                <h4 class="font-medium text-zinc-900 dark:text-zinc-100">{{ $gift->title }}</h4>
+                                @if ($gift->value)
+                                    <p class="text-sm text-zinc-600 dark:text-zinc-400">${{ number_format($gift->value, 2) }}</p>
+                                @endif
+                                @if ($gift->link)
+                                    <a href="{{ $gift->link }}" target="_blank" rel="noopener noreferrer" class="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+                                        View Product
+                                        <flux:icon.arrow-up-right class="size-3" />
+                                    </a>
+                                @endif
+                            </div>
                         </div>
                         <div class="flex gap-2">
                             <flux:button size="sm" variant="ghost" href="{{ route('gifts.edit', $gift) }}" wire:navigate>Edit</flux:button>

@@ -228,6 +228,26 @@
                 placeholder="50.00"
             />
 
+            <div class="space-y-3">
+                <flux:input
+                    wire:model="giftLink"
+                    label="Link (Optional)"
+                    type="url"
+                    placeholder="https://example.com/product"
+                />
+
+                <flux:switch wire:model.live="fetchImageFromLink" label="Fetch image from link" />
+            </div>
+
+            @if (!$fetchImageFromLink)
+                <flux:input
+                    wire:model="giftImage"
+                    label="Image Upload"
+                    type="file"
+                    accept="image/*"
+                />
+            @endif
+
             <div class="flex gap-3 justify-end">
                 <flux:button type="button" variant="ghost" wire:click="closeGiftModal">
                     Cancel

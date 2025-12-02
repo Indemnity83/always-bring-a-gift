@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('title');
             $table->decimal('value', 10, 2)->nullable();
             $table->integer('year');
+            $table->string('image_path')->nullable()->after('value');
+            $table->string('link')->nullable()->after('image_path');
             $table->timestamps();
 
             $table->index(['event_id', 'year']);
