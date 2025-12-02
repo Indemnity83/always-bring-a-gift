@@ -49,6 +49,31 @@
             </div>
         </form>
 
+        @if (config('services.authentik.client_id'))
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-zinc-200 dark:border-zinc-700"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400">
+                        {{ __('Or continue with') }}
+                    </span>
+                </div>
+            </div>
+
+            <flux:button
+                variant="outline"
+                href="{{ route('authentik.redirect') }}"
+                class="w-full"
+            >
+                <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" opacity="0.5"/>
+                    <path d="M2 17L12 22L22 17L12 12L2 17Z" fill="currentColor"/>
+                </svg>
+                {{ __('Sign in with Authentik') }}
+            </flux:button>
+        @endif
+
         @if (Route::has('register'))
             <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
                 <span>{{ __('Don\'t have an account?') }}</span>

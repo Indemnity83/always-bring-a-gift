@@ -13,6 +13,12 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+// Authentik OAuth routes
+Route::get('auth/authentik', [App\Http\Controllers\Auth\AuthentikController::class, 'redirect'])
+    ->name('authentik.redirect');
+Route::get('auth/authentik/callback', [App\Http\Controllers\Auth\AuthentikController::class, 'callback'])
+    ->name('authentik.callback');
+
 Route::get('dashboard', Dashboard::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
