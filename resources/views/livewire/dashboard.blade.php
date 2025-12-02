@@ -76,7 +76,7 @@
                 @php
                     $isCompleted = $event->isCompletedForYear($event->next_occurrence_year);
                 @endphp
-                <div class="rounded-lg border p-6 shadow-sm {{ $isCompleted ? 'border-zinc-300/50 dark:border-zinc-600/50 bg-zinc-50/50 dark:bg-zinc-800/50 opacity-75' : 'border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900' }}">
+                <div class="rounded-lg border p-6 shadow-sm flex flex-col {{ $isCompleted ? 'border-zinc-300/50 dark:border-zinc-600/50 bg-zinc-50/50 dark:bg-zinc-800/50 opacity-75' : 'border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900' }}">
                     <div class="flex items-start justify-between mb-4">
                         <div class="flex items-center gap-2">
                             <div>
@@ -132,8 +132,9 @@
                                 @endif
                             </div>
                         @endif
+                    </div>
 
-                        <div class="flex gap-2 pt-2">
+                    <div class="flex gap-2 pt-2 mt-auto">
                             @if (!$isCompleted)
                                 <flux:button
                                     size="sm"
@@ -149,6 +150,7 @@
                                 variant="{{ $isCompleted ? 'ghost' : 'outline' }}"
                                 wire:click="toggleCompletion({{ $event->id }})"
                                 icon="{{ $isCompleted ? 'x-mark' : 'check' }}"
+                                class="{{ $isCompleted ? 'flex-1' : '' }}"
                             >
                                 {{ $isCompleted ? 'Uncomplete' : 'Complete' }}
                             </flux:button>
@@ -157,10 +159,10 @@
                                 variant="ghost"
                                 href="{{ route('events.show', $event) }}"
                                 icon="arrow-right"
+                                class="{{ $isCompleted ? 'flex-1' : '' }}"
                             >
                                 Details
                             </flux:button>
-                        </div>
                     </div>
                 </div>
             @endforeach
