@@ -24,7 +24,6 @@ class EventFactory extends Factory
             'recurrence' => 'none',
             'date' => fake()->dateTimeBetween('-1 year', '+1 year'),
             'target_value' => fake()->optional()->randomFloat(2, 10, 500),
-            'notes' => fake()->optional()->sentence(),
         ];
     }
 

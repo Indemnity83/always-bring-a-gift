@@ -19,12 +19,6 @@
         <flux:callout variant="success">{{ session('status') }}</flux:callout>
     @endif
 
-    @if ($event->notes)
-        <div class="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 p-4">
-            <p class="text-sm text-zinc-700 dark:text-zinc-300"><strong>Notes:</strong> {{ $event->notes }}</p>
-        </div>
-    @endif
-
     @if ($event->target_value)
         @php
             $totalValue = $event->totalGiftsValueForYear($nextOccurrenceYear);

@@ -21,8 +21,6 @@ class Create extends Component
 
     public string $target_value = '';
 
-    public string $notes = '';
-
     /**
      * Mount the component
      */
@@ -43,7 +41,6 @@ class Create extends Component
             'show_milestone' => ['boolean'],
             'date' => ['required', 'date'],
             'target_value' => ['nullable', 'numeric', 'min:0'],
-            'notes' => ['nullable', 'string', 'max:5000'],
         ]);
 
         $validated['person_id'] = $this->person->id;

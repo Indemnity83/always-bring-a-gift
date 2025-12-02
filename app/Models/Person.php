@@ -41,4 +41,12 @@ class Person extends Model
     {
         return $this->hasMany(Event::class);
     }
+
+    /**
+     * Get the gift ideas for the person
+     */
+    public function giftIdeas(): HasMany
+    {
+        return $this->hasMany(GiftIdea::class);
+    }
 }

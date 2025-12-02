@@ -24,7 +24,6 @@
 
         <flux:input wire:model="date" label="Date" type="date" required />
         <flux:input wire:model="target_value" label="Target Budget" type="number" step="0.01" min="0" />
-        <flux:textarea wire:model="notes" label="Gift Ideas / Notes" rows="4" />
 
         <div class="flex gap-3">
             <flux:button type="submit" variant="primary">Update Event</flux:button>

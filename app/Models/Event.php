@@ -26,7 +26,6 @@ class Event extends Model
         'show_milestone',
         'date',
         'target_value',
-        'notes',
     ];
 
     /**

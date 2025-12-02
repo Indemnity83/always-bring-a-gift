@@ -23,8 +23,6 @@
 
         <flux:input wire:model="target_value" label="Target Budget (Optional)" type="number" step="0.01" min="0" placeholder="100.00" />
 
-        <flux:textarea wire:model="notes" label="Gift Ideas / Notes" placeholder="Optional notes or gift ideas for this event..." rows="4" />
-
         <div class="flex gap-3">
             <flux:button type="submit" variant="primary">
                 Create Event

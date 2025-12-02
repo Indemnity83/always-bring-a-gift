@@ -20,8 +20,6 @@ class Edit extends Component
 
     public string $target_value = '';
 
-    public string $notes = '';
-
     /**
      * Mount the component
      */
@@ -33,7 +31,6 @@ class Edit extends Component
         $this->show_milestone = $event->show_milestone;
         $this->date = $event->date->format('Y-m-d');
         $this->target_value = $event->target_value ?? '';
-        $this->notes = $event->notes ?? '';
     }
 
     /**
@@ -47,7 +44,6 @@ class Edit extends Component
             'show_milestone' => ['boolean'],
             'date' => ['required', 'date'],
             'target_value' => ['nullable', 'numeric', 'min:0'],
-            'notes' => ['nullable', 'string', 'max:5000'],
         ]);
 
         $validated['target_value'] = $validated['target_value'] ?: null;
