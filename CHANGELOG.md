@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Comprehensive README with deployment and development instructions
 - MIT License file
+- CONTRIBUTING.md with contribution guidelines
+- CODE_OF_CONDUCT.md (Contributor Covenant v2.1)
+- GitHub issue templates (bug report, feature request)
+- `.claude` directory to .gitignore
 
 ### Changed
 - Renamed "Build & Publish Docker Images" workflow to "Build" for cleaner badge display
