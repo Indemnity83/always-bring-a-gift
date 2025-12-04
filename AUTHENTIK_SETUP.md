@@ -32,7 +32,12 @@ In your Authentik admin panel:
    - Authorization flow: `authorization-code`
    - Client type: `confidential`
    - Redirect URIs: `https://yourdomain.com/auth/authentik/callback`
-   - Scopes: `openid`, `profile`, `email`
+   - **Property Mappings** (IMPORTANT):
+     - Under "Scopes", ensure these are selected:
+       - `authentik default OAuth Mapping: OpenID 'openid'`
+       - `authentik default OAuth Mapping: OpenID 'profile'`
+       - `authentik default OAuth Mapping: OpenID 'email'`
+     - These mappings ensure email, name, and other user attributes are included in the response
 
 2. **Create Application:**
    - Go to Applications → Applications → Create
