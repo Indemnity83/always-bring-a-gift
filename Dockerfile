@@ -40,13 +40,11 @@ RUN npm run build
 FROM php:8.2-cli-alpine
 
 # Install only runtime dependencies
-# Note: Using --update-cache and --initramfs-diskless-boot to workaround
-# busybox trigger issues with QEMU emulation on ARM64 builds
-RUN apk add --no-cache --update-cache --initramfs-diskless-boot \
-    curl \
-    sqlite \
-    sqlite-dev \
-    su-exec \
+# Note: Install packages one-by-one to avoid busybox trigger issues
+# with QEMU emulation on ARM64 builds (busybox 1.37.0-r29 bug)
+RUN apk add --no-cache curl \
+    && apk add --no-cache sqlite sqlite-dev \
+    && apk add --no-cache su-exec \
     && docker-php-ext-install pdo pdo_sqlite bcmath \
     && rm -rf /var/cache/apk/*
 
