@@ -9,13 +9,13 @@ if [ -z "$APP_URL" ]; then
 fi
 
 echo "💻 Setup Environment:"
+php artisan config:clear --quiet
 export APP_TIMEZONE="${TZ:-UTC}"
 export ASSET_URL="$APP_URL"
 php artisan config:show app.env
 php artisan config:show app.debug
 php artisan config:show app.url
 php artisan config:show app.timezone
-php artisan config:show app.trusted_proxies
 
 # Ensure storage directory structure exists
 echo "📁 Ensuring storage directory structure..."

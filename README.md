@@ -117,10 +117,6 @@ APP_TIMEZONE=UTC
 DB_CONNECTION=sqlite
 DB_DATABASE=/app/storage/database.sqlite
 
-# Trusted Proxies (for reverse proxy deployments like Traefik)
-# Leave empty for direct deployment, use '*' for Docker/Traefik
-TRUSTED_PROXIES=*
-
 # Amazon Product Integration (optional)
 OPENWEB_NINJA_KEY=your_api_key_here
 
