@@ -97,4 +97,4 @@ find storage bootstrap/cache -type f -exec chmod 664 {} \;
 echo "✅ Application ready!"
 
 # Start FrankenPHP server as the configured user with Caddyfile
-exec su-exec "$PUID:$PGID" frankenphp run --config /etc/caddy/Caddyfile
+exec gosu "$PUID:$PGID" frankenphp run --config /etc/caddy/Caddyfile

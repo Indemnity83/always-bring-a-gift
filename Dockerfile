@@ -43,13 +43,9 @@ RUN npm run build
 FROM dunglas/frankenphp:1-php8.2
 
 # Install only runtime dependencies
-RUN install-php-extensions \
-    pdo_sqlite \
-    bcmath \
-    && apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    sqlite3 \
-    su-exec \
+# pdo_sqlite, bcmath, and curl are already included in base image
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gosu \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
