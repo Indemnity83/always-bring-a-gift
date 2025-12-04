@@ -6,12 +6,12 @@ WORKDIR /app
 # Copy composer files
 COPY composer.json composer.lock ./
 
-# Install dependencies (no cache, skip discovery since we don't have Laravel yet)
-RUN composer install \
+# Install dependencies (with cache mount for faster rebuilds)
+RUN --mount=type=cache,target=/tmp/cache \
+    COMPOSER_CACHE_DIR=/tmp/cache composer install \
     --no-dev \
     --optimize-autoloader \
     --no-interaction \
-    --no-cache \
     --prefer-dist \
     --no-scripts
 
@@ -23,8 +23,9 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies (with cache mount for faster rebuilds)
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 
 # Copy vendor folder from PHP builder (needed for CSS references)
 COPY --from=php-builder /app/vendor ./vendor
