@@ -32,7 +32,12 @@ In your Authentik admin panel:
    - Authorization flow: `authorization-code`
    - Client type: `confidential`
    - Redirect URIs: `https://yourdomain.com/auth/authentik/callback`
-   - Scopes: `openid`, `profile`, `email`
+   - **Property Mappings** (IMPORTANT):
+     - Under "Scopes", ensure these are selected:
+       - `authentik default OAuth Mapping: OpenID 'openid'`
+       - `authentik default OAuth Mapping: OpenID 'profile'`
+       - `authentik default OAuth Mapping: OpenID 'email'`
+     - These mappings ensure email, name, and other user attributes are included in the response
 
 2. **Create Application:**
    - Go to Applications → Applications → Create
@@ -114,11 +119,57 @@ Then configure with `http://localhost:9000` as the base URL.
 
 ## Troubleshooting
 
+### "Invalid Grant" Error (400 Bad Request)
+This error typically means:
+
+1. **Redirect URI Mismatch** - Most common cause
+   - Check `.env`: `AUTHENTIK_REDIRECT_URI=https://yourdomain.com/auth/authentik/callback`
+   - In Authentik provider settings, ensure "Redirect URIs" includes the **exact** URL
+   - Must match **exactly** - including protocol (https), domain, and path
+   - **Important**: Some reverse proxies (like Traefik/nginx) may need special configuration
+
+2. **Wrong Client Credentials**
+   - Verify `AUTHENTIK_CLIENT_ID` matches the provider's Client ID in Authentik
+   - Verify `AUTHENTIK_CLIENT_SECRET` matches the provider's Client Secret
+   - Check for extra spaces or line breaks in `.env`
+
+3. **Authentik Configuration**
+   - Provider must use **Authorization Code** flow (not implicit)
+   - Client type should be **Confidential** (not public)
+   - Required scopes: `openid`, `profile`, `email`
+
+4. **HTTPS Requirements**
+   - Production redirect URIs must use `https://`
+   - Ensure your `APP_URL` in `.env` matches your actual URL
+   - Check `config('app.url')` returns the correct HTTPS URL
+
+### Connection Timeouts
+- Verify `AUTHENTIK_BASE_URL` is accessible from your server
+- Check firewall rules allow outbound HTTPS to Authentik server
+- Test connection: `curl -I https://your-authentik-url.com`
+
 ### "Unable to authenticate with Authentik"
 - Check Laravel logs: `tail -f storage/logs/laravel.log`
 - Verify Authentik credentials in `.env`
 - Confirm redirect URI matches exactly in Authentik config
 - Ensure Authentik is accessible from your server
+
+### Reverse Proxy Configuration
+If behind a reverse proxy (Traefik, nginx, Caddy), ensure:
+
+**For Traefik/nginx:**
+```conf
+# Ensure X-Forwarded headers are set
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;
+proxy_set_header X-Forwarded-Host $host;
+```
+
+**Laravel Trusted Proxies:**
+```env
+# In .env - trust all proxies (or specify proxy IPs)
+TRUSTED_PROXIES=*
+```
 
 ### Users can't register via Authentik
 - This is **expected behavior** - users are auto-created on first SSO login
