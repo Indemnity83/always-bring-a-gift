@@ -31,7 +31,7 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 3. **Make your changes** following the guidelines below
 4. **Test your changes** thoroughly
 5. **Update documentation** if needed
-6. **Update the CHANGELOG.md** in the `[Unreleased]` section
+6. **Use conventional commits** (see Commit Messages below)
 7. **Submit a pull request**
 
 ## Development Guidelines
@@ -52,7 +52,9 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 
 ### Commit Messages
 
-Follow conventional commit format:
+**We use conventional commits to automate releases and changelog generation.**
+
+Follow this format:
 
 ```
 type: short description
@@ -60,29 +62,43 @@ type: short description
 Longer description if needed
 ```
 
-**Types:**
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `refactor`: Code refactoring
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks
+**Types and Their Impact:**
+- `feat:` - New feature → triggers **minor** version bump (v0.2.0 → v0.3.0)
+- `fix:` - Bug fix → triggers **patch** version bump (v0.2.0 → v0.2.1)
+- `feat!:` or `BREAKING CHANGE:` - Breaking change → triggers **major** version bump
+- `docs:` - Documentation only (no version bump)
+- `refactor:` - Code refactoring (no version bump)
+- `test:` - Adding or updating tests (no version bump)
+- `chore:` - Maintenance tasks (no version bump)
+- `ci:` - CI/CD changes (no version bump)
 
 **Examples:**
 ```
 feat: add gift wishlist feature
+# This will bump the minor version and appear in the changelog
 
 fix: resolve timezone issue in event notifications
+# This will bump the patch version and appear in the changelog
 
 docs: update Docker deployment instructions
+# This won't bump the version but helps documentation
+
+feat!: change authentication to OAuth2
+# Breaking change - will bump major version
 ```
+
+**Tips:**
+- Keep the first line under 72 characters
+- Use present tense: "add" not "added"
+- Focus on what and why, not how
+- Reference issues: `fix: resolve login bug (#123)`
 
 ### Documentation
 
 - Update README.md for significant changes
 - Add comments for complex logic
-- Update CHANGELOG.md in the `[Unreleased]` section
 - Include PHPDoc blocks for new methods
+- **Note:** CHANGELOG.md is auto-generated from commit messages - don't edit it manually
 
 ## Development Setup
 

@@ -5,25 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-### Added
-- Comprehensive README with deployment and development instructions
-- MIT License file
-- CONTRIBUTING.md with contribution guidelines
-- CODE_OF_CONDUCT.md with psychological safety framework (Contributor Covenant v2.1)
-- GitHub issue templates (bug report, feature request)
-- `.claude` directory to .gitignore
-- Configurable trusted proxies support via `TRUSTED_PROXIES` environment variable
-
-### Changed
-- Renamed "Build & Publish Docker Images" workflow to "Build" for cleaner badge display
-- Docker images now default to trusting all proxies (safe for Traefik/reverse proxy deployments)
-
-### Security
-- Trusted proxies now configurable via environment variable instead of hardcoded (prevents security issues in direct deployments)
-
-## [0.1.0] - 2025-12-03
+## [0.1.0](https://github.com/indemnity83/always-bring-a-gift/releases/tag/v0.1.0) - 2025-12-03
 
 ### Added
 - Initial release of Always Bring a Gift (ABAG)
@@ -56,6 +38,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tagged releases: `ghcr.io/indemnity83/always-bring-a-gift:v0.1.0`
 - Development builds: `ghcr.io/indemnity83/always-bring-a-gift:dev`
 - Supports both amd64 and arm64 architectures
-
-[Unreleased]: https://github.com/indemnity83/always-bring-a-gift/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/indemnity83/always-bring-a-gift/releases/tag/v0.1.0
