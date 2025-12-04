@@ -38,16 +38,19 @@ COPY vite.config.js ./
 RUN npm run build
 
 # Stage 3: Final runtime image with FrankenPHP
-FROM dunglas/frankenphp:1-php8.2-alpine
+# Using Debian-based image instead of Alpine for better performance
+# See: https://frankenphp.dev/docs/performance/#binary-selection
+FROM dunglas/frankenphp:1-php8.2
 
 # Install only runtime dependencies
 RUN install-php-extensions \
     pdo_sqlite \
     bcmath \
-    && apk add --no-cache \
+    && apt-get update && apt-get install -y --no-install-recommends \
     curl \
-    sqlite \
-    su-exec
+    sqlite3 \
+    su-exec \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
@@ -77,6 +80,15 @@ ENV DB_CONNECTION=sqlite
 ENV DB_DATABASE=/app/storage/database.sqlite
 ENV LOG_CHANNEL=daily
 ENV LOG_LEVEL=info
+
+# Use file-based drivers to reduce SQLite contention
+ENV SESSION_DRIVER=file
+ENV CACHE_STORE=file
+
+# FrankenPHP performance optimizations
+# See: https://frankenphp.dev/docs/performance/
+ENV GODEBUG=cgocheck=0
+ENV GOMEMLIMIT=512MiB
 
 # App code: read-only for everyone
 RUN find /app -type d -exec chmod 755 {} \; \

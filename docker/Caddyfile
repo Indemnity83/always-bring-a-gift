@@ -16,5 +16,15 @@
 
 :8000 {
 	root * /app/public
-	php_server
+
+	# Performance optimizations
+	# See: https://frankenphp.dev/docs/performance/
+	resolve_root_symlink false
+
+	php_server {
+		# Adjust num_threads based on available memory
+		# Rule: num_threads x memory_limit < available_memory
+		# With 512M memory_limit and ~2GB available: 3 threads
+		num_threads 3
+	}
 }
