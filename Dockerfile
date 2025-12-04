@@ -37,20 +37,17 @@ COPY vite.config.js ./
 # Build assets
 RUN npm run build
 
-# Stage 3: Final runtime image
-# Using edge repository to get newer busybox that may have QEMU fixes
-FROM php:8.2-cli-alpine3.21
+# Stage 3: Final runtime image with FrankenPHP
+FROM dunglas/frankenphp:1-php8.2-alpine
 
 # Install only runtime dependencies
-# Note: Disable busybox triggers to workaround QEMU emulation issues
-# on ARM64 builds (busybox 1.37.0-r29 bug)
-RUN apk add --no-cache --no-scripts \
+RUN install-php-extensions \
+    pdo_sqlite \
+    bcmath \
+    && apk add --no-cache \
     curl \
     sqlite \
-    sqlite-dev \
-    su-exec \
-    && docker-php-ext-install pdo pdo_sqlite bcmath \
-    && rm -rf /var/cache/apk/*
+    su-exec
 
 # Set working directory
 WORKDIR /app
@@ -64,6 +61,10 @@ COPY --from=frontend-builder /app/public/build ./public/build
 # Copy PHP dependencies from php builder
 COPY --from=php-builder /app/vendor ./vendor
 
+# Copy Caddyfile configuration
+COPY docker/Caddyfile /etc/caddy/Caddyfile
+RUN chmod 644 /etc/caddy/Caddyfile
+
 # Copy entrypoint scripts
 COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod 755 /usr/local/bin/docker-entrypoint.sh
@@ -74,9 +75,8 @@ ENV APP_REGISTRATION_ENABLED=false
 ENV APP_TIMEZONE=UTC
 ENV DB_CONNECTION=sqlite
 ENV DB_DATABASE=/app/storage/database.sqlite
-ENV LOG_CHANNEL=stderr
+ENV LOG_CHANNEL=daily
 ENV LOG_LEVEL=info
-ENV TRUSTED_PROXIES=*
 
 # App code: read-only for everyone
 RUN find /app -type d -exec chmod 755 {} \; \
@@ -84,5 +84,8 @@ RUN find /app -type d -exec chmod 755 {} \; \
     && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/up || exit 1
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

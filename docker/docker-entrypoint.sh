@@ -8,15 +8,6 @@ if [ -z "$APP_URL" ]; then
     exit 1
 fi
 
-echo "💻 Setup Environment:"
-php artisan config:clear --quiet
-export APP_TIMEZONE="${TZ:-UTC}"
-export ASSET_URL="$APP_URL"
-php artisan config:show app.env
-php artisan config:show app.debug
-php artisan config:show app.url
-php artisan config:show app.timezone
-
 # Ensure storage directory structure exists
 echo "📁 Ensuring storage directory structure..."
 mkdir -p storage/app/public
@@ -25,6 +16,16 @@ mkdir -p storage/framework/sessions
 mkdir -p storage/framework/testing
 mkdir -p storage/framework/views
 mkdir -p storage/logs
+mkdir -p storage/caddy
+
+echo "💻 Setup Environment:"
+php artisan config:clear --quiet
+export APP_TIMEZONE="${TZ:-UTC}"
+export ASSET_URL="$APP_URL"
+php artisan config:show app.env
+php artisan config:show app.debug
+php artisan config:show app.url
+php artisan config:show app.timezone
 
 # Run package discovery (after all directories are ready)
 echo "📦 Running package discovery..."
@@ -97,5 +98,5 @@ find storage bootstrap/cache -type f -exec chmod 664 {} \;
 
 echo "✅ Application ready!"
 
-# Start the Laravel development server as the configured user
-exec su-exec "$PUID:$PGID" php artisan serve --host=0.0.0.0 --port=8000
+# Start FrankenPHP server as the configured user with Caddyfile
+exec su-exec "$PUID:$PGID" frankenphp run --config /etc/caddy/Caddyfile

@@ -1,0 +1,20 @@
+{
+	# Disable admin endpoint
+	admin off
+
+	# Disable automatic HTTPS
+	auto_https off
+
+	# Disable persisting config
+	persist_config off
+
+	# Use writable storage location
+	storage file_system {
+		root /app/storage/caddy
+	}
+}
+
+:8000 {
+	root * /app/public
+	php_server
+}
