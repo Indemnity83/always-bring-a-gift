@@ -75,9 +75,8 @@ ENV APP_REGISTRATION_ENABLED=false
 ENV APP_TIMEZONE=UTC
 ENV DB_CONNECTION=sqlite
 ENV DB_DATABASE=/app/storage/database.sqlite
-ENV LOG_CHANNEL=stderr
+ENV LOG_CHANNEL=daily
 ENV LOG_LEVEL=info
-ENV TRUSTED_PROXIES=*
 
 # App code: read-only for everyone
 RUN find /app -type d -exec chmod 755 {} \; \
