@@ -2,7 +2,7 @@
 	# Disable admin endpoint
 	admin off
 
-	# Disable automatic HTTPS since we're behind a reverse proxy
+	# Disable automatic HTTPS
 	auto_https off
 
 	# Disable persisting config
