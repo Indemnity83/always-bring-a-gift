@@ -37,7 +37,8 @@ COPY vite.config.js ./
 RUN npm run build
 
 # Stage 3: Final runtime image
-FROM php:8.2-cli-alpine
+# Using edge repository to get newer busybox that may have QEMU fixes
+FROM php:8.2-cli-alpine3.21
 
 # Install only runtime dependencies
 # Note: Disable busybox triggers to workaround QEMU emulation issues
