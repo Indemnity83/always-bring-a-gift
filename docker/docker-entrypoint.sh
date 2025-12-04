@@ -75,9 +75,7 @@ fi
 
 # Cache configuration and routes for better performance
 echo "✨ Optimizing application..."
-php artisan config:cache --quiet
-php artisan route:cache --quiet
-php artisan view:cache --quiet
+php artisan optimize
 
 # Handle PUID/PGID for Unraid and similar systems
 PUID=${PUID:-1000}
