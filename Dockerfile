@@ -37,10 +37,13 @@ COPY vite.config.js ./
 RUN npm run build
 
 # Stage 3: Final runtime image
-FROM php:8.2-cli-alpine
+# Using edge repository to get newer busybox that may have QEMU fixes
+FROM php:8.2-cli-alpine3.21
 
 # Install only runtime dependencies
-RUN apk add --no-cache \
+# Note: Disable busybox triggers to workaround QEMU emulation issues
+# on ARM64 builds (busybox 1.37.0-r29 bug)
+RUN apk add --no-cache --no-scripts \
     curl \
     sqlite \
     sqlite-dev \
