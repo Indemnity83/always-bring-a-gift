@@ -1,10 +1,10 @@
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
-        <div>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div class="flex-1">
             <flux:heading size="xl">People</flux:heading>
             <flux:subheading>Manage the people you give gifts to</flux:subheading>
         </div>
-        <flux:button variant="primary" href="{{ route('people.create') }}" icon="plus" wire:navigate>
+        <flux:button variant="primary" href="{{ route('people.create') }}" icon="plus" wire:navigate class="w-full sm:w-auto">
             Add Person
         </flux:button>
     </div>
