@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0](https://github.com/Indemnity83/always-bring-a-gift/compare/v0.2.0...v0.3.0) (2025-12-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* The anniversary field has been added into the create_people migration. Existing users upgrading to this version must manually add the anniversary column to their database with: ALTER TABLE people ADD COLUMN anniversary DATE;
+
+### Features
+
+* add bulk import for people with CSV/vCard support ([#30](https://github.com/Indemnity83/always-bring-a-gift/issues/30)) ([0790dd0](https://github.com/Indemnity83/always-bring-a-gift/commit/0790dd0c6bd95cb7aeb23b2cc346ae0c98bd4498))
+* make trusted proxies configurable via environment variable ([#36](https://github.com/Indemnity83/always-bring-a-gift/issues/36)) ([0f7a1fa](https://github.com/Indemnity83/always-bring-a-gift/commit/0f7a1fa9bd693b1b781dfd1f0a70735d4525f252))
+
+
+### Bug Fixes
+
+* improve mobile layout responsiveness ([#29](https://github.com/Indemnity83/always-bring-a-gift/issues/29)) ([4ac3454](https://github.com/Indemnity83/always-bring-a-gift/commit/4ac3454794491ee05ed304663442447f0215aa33))
+* remove release-type from workflow to use config file ([c3c87f6](https://github.com/Indemnity83/always-bring-a-gift/commit/c3c87f6243d151d61c299f68cda38c4c623f57a3))
+
+
+### Miscellaneous Chores
+
+* add release-please manifest with current version ([aa57a66](https://github.com/Indemnity83/always-bring-a-gift/commit/aa57a66d7dedfabacc6f5990b64227609ae99a9d))
+* allow manual triggering of release workflow ([#33](https://github.com/Indemnity83/always-bring-a-gift/issues/33)) ([880517b](https://github.com/Indemnity83/always-bring-a-gift/commit/880517b0a82411b9337c6fac551bc1d9130060ab))
+* configure release-please for pre-1.0 versioning ([f844b08](https://github.com/Indemnity83/always-bring-a-gift/commit/f844b08d13fd3bbfcbceeef2aca0f2b931f56c7d))
+* remove user registration functionality ([#27](https://github.com/Indemnity83/always-bring-a-gift/issues/27)) ([bf9aa80](https://github.com/Indemnity83/always-bring-a-gift/commit/bf9aa80b96b58ffaa1b68e58cf9be8653c36488c))
+* update unraid-template.xml with beta metadata and improvements ([#37](https://github.com/Indemnity83/always-bring-a-gift/issues/37)) ([8db8f55](https://github.com/Indemnity83/always-bring-a-gift/commit/8db8f55388f9c873b2ada2d951b6c396c1e1190d))
+
 ## [0.2.0](https://github.com/Indemnity83/always-bring-a-gift/compare/v0.1.0...v0.2.0) (2025-12-05)
 
 
