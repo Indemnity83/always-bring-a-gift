@@ -44,11 +44,13 @@ Access the application at `http://localhost:8000`
 - Email: `admin@example.com`
 - Password: _(generated on first run, check logs)_
 
+### UnRAID
+
+Install via Community Applications or download the [template](unraid-template.xml) to your UnRAID server.
+
 ### Docker Compose
 
 ```yaml
-version: '3.8'
-
 services:
   abag:
     image: ghcr.io/indemnity83/always-bring-a-gift:latest
@@ -56,20 +58,12 @@ services:
       - "8000:8000"
     volumes:
       - abag-data:/app/storage
-    environment:
-      APP_URL: http://localhost:8000
-      APP_TIMEZONE: America/New_York
-      # Optional: OpenWeb Ninja API for Amazon product images
-      # OPENWEB_NINJA_KEY: your_api_key_here
-      # Optional: Authentik SSO
-      # AUTHENTIK_CLIENT_ID: your_client_id
-      # AUTHENTIK_CLIENT_SECRET: your_client_secret
-      # AUTHENTIK_BASE_URL: https://auth.example.com
-      # AUTHENTIK_REDIRECT_URI: http://localhost:8000/auth/callback
 
 volumes:
   abag-data:
 ```
+
+See [DOCKER.md](DOCKER.md) for advanced configuration options.
 
 ### Local Development
 
@@ -104,28 +98,7 @@ php artisan serve
 
 ## Configuration
 
-### Environment Variables
-
-Key environment variables you may want to configure:
-
-```bash
-# Application
-APP_URL=http://localhost:8000
-APP_TIMEZONE=UTC
-
-# Database (default: SQLite)
-DB_CONNECTION=sqlite
-DB_DATABASE=/app/storage/database.sqlite
-
-# Amazon Product Integration (optional)
-OPENWEB_NINJA_KEY=your_api_key_here
-
-# Authentik SSO (optional)
-AUTHENTIK_CLIENT_ID=
-AUTHENTIK_CLIENT_SECRET=
-AUTHENTIK_BASE_URL=
-AUTHENTIK_REDIRECT_URI=
-```
+The application works out-of-the-box with sensible defaults. Optional configuration is available for advanced use cases - see [DOCKER.md](DOCKER.md) for details.
 
 ### First-Time Setup
 
