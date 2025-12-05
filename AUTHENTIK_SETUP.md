@@ -60,7 +60,12 @@ AUTHENTIK_CLIENT_ID=your_client_id_here
 AUTHENTIK_CLIENT_SECRET=your_client_secret_here
 AUTHENTIK_REDIRECT_URI=https://yourdomain.com/auth/authentik/callback
 AUTHENTIK_BASE_URL=https://authentik.yourdomain.com
+
+# APP_URL is REQUIRED for OAuth to work correctly
+APP_URL=https://yourdomain.com
 ```
+
+**Important:** Unlike basic deployments where `APP_URL` is optional, it **is required** when using Authentik OAuth. Laravel uses this to generate the correct callback redirect URIs. Without it, OAuth authentication will fail.
 
 ### 3. Test the Integration
 

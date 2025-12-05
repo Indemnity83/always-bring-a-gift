@@ -4,73 +4,121 @@ Always Bring a Gift (ABAG) can be deployed as a Docker container for easy self-h
 
 ## Quick Start
 
-### Using Docker Compose (Recommended)
-
-1. Create a `docker-compose.yml` file (or use the provided example):
-
-```bash
-cp docker-compose.yml docker-compose.prod.yml
-```
-
-2. Edit `docker-compose.prod.yml` and update the environment variables:
-   - `APP_URL`: Your application URL
-   - `PUID`: User ID to run the application as (default: 1000)
-   - `PGID`: Group ID to run the application as (default: 1000)
-   - `TZ`: The timezone for the host/application (default: UTC)
-
-3. Start the container:
-
-```bash
-docker-compose -f docker-compose.prod.yml up -d
-```
-
-4. Access the application at http://localhost:8000
-
-5. Log in with the admin credentials shown in the log output. **This info will only be shown on first start**!
-
 ### Using Docker Run
 
 ```bash
 docker run -d \
   --name abag \
   -p 8000:8000 \
-  -e APP_URL=http://localhost:8000 \
-  -e PUID=99 \
-  -e PGID=100 \
-  -e TZ=America/Los_Angeles \
-  -v abag_storage:/app/storage \
+  -v abag-data:/app/storage \
   ghcr.io/indemnity83/always-bring-a-gift:latest
 ```
 
+Access at `http://localhost:8000` and check logs for the admin password.
+
+### Using Docker Compose
+
+```yaml
+services:
+  abag:
+    image: ghcr.io/indemnity83/always-bring-a-gift:latest
+    container_name: abag
+    ports:
+      - "8000:8000"
+    volumes:
+      - abag-data:/app/storage
+    restart: unless-stopped
+
+volumes:
+  abag-data:
+```
+
+Start with:
+```bash
+docker compose up -d
+```
+
+### UnRAID Community Applications
+
+1. **Via Community Applications:**
+   - Search for "Always Bring a Gift" in Community Applications
+   - Click Install and configure the port if needed
+   - Click Apply
+
+2. **Manual Template Installation:**
+   - Download [unraid-template.xml](unraid-template.xml)
+   - Place in `/boot/config/plugins/dockerMan/templates-user/`
+   - Refresh Docker page in UnRAID
+
+The template provides:
+- **WebUI Port:** 8000 (customizable)
+- **AppData Path:** `/mnt/user/appdata/always-bring-a-gift` (auto-configured)
+- **PUID/PGID:** 99/100 (UnRAID defaults, hidden in advanced settings)
+
+That's it! Everything else is auto-configured.
+
 ## Environment Variables
 
-### User/Group IDs (Unraid Compatibility)
+All environment variables are optional. The application auto-detects URLs and uses sensible defaults.
 
-For systems like Unraid where you need to match host user/group IDs:
+### Application URL (Optional)
 
-- `PUID`: User ID to run the application as (default: 1000)
-- `PGID`: Group ID to run the application as (default: 1000)
-
-**Example for Unraid:**
 ```yaml
 environment:
-  - PUID=99
-  - PGID=100
+  - APP_URL=https://gifts.example.com
 ```
-### Admin User (First Run)
 
-On the first run, the system will automatically create an admin user:
-- **Email**: `admin@example.com`
-- **Password**: Random password displayed in the container logs
+**When to set:**
+- Using Authentik OAuth (required for callback redirects)
+- Behind a reverse proxy with custom domain
 
-⚠️ **Important**:
-- The random password will **only be shown once** in the logs on first startup
-- View the password with: `docker logs abag | grep Password`
-- Change the admin password immediately after first login!
+**When NOT needed:**
+- Direct access via IP or hostname (auto-detected from request)
+- Most UnRAID deployments
 
-### Database
+### User/Group IDs
 
-By default, the container uses SQLite stored in a Docker volume. For PostgreSQL or MySQL:
+```yaml
+environment:
+  - PUID=99    # User ID (default: 1000, UnRAID: 99)
+  - PGID=100   # Group ID (default: 1000, UnRAID: 100)
+```
+
+Controls file ownership in the `/app/storage` volume. UnRAID users typically use 99:100 (nobody:users).
+
+### Timezone (Optional)
+
+```yaml
+environment:
+  - TZ=America/New_York
+```
+
+Defaults to UTC. The app doesn't display many times to users, so this is rarely needed.
+
+### Amazon Product Integration (Optional)
+
+```yaml
+environment:
+  - OPENWEB_NINJA_KEY=your_api_key_here
+```
+
+Enables fetching product images from Amazon URLs. Get a key from [OpenWeb Ninja API](https://rapidapi.com/developer-omniagent/api/openweb-ninja).
+
+### Authentik SSO (Optional)
+
+```yaml
+environment:
+  - AUTHENTIK_CLIENT_ID=your-client-id
+  - AUTHENTIK_CLIENT_SECRET=your-client-secret
+  - AUTHENTIK_BASE_URL=https://authentik.example.com
+  - APP_URL=https://gifts.example.com  # Required for OAuth callback
+```
+
+See [AUTHENTIK_SETUP.md](AUTHENTIK_SETUP.md) for complete setup instructions.
+
+### Database (Advanced)
+
+By default, uses SQLite in the Docker volume. For PostgreSQL or MySQL:
 
 ```yaml
 environment:
@@ -82,137 +130,201 @@ environment:
   - DB_PASSWORD=secret
 ```
 
-### Optional: Authentik SSO
+## Admin User (First Run)
 
-```yaml
-environment:
-  - AUTHENTIK_CLIENT_ID=your-client-id
-  - AUTHENTIK_CLIENT_SECRET=your-client-secret
-  - AUTHENTIK_REDIRECT_URI=http://localhost:8080/auth/authentik/callback
-  - AUTHENTIK_BASE_URL=https://authentik.example.com
-```
+On first run, an admin user is automatically created:
+- **Email:** `admin@example.com`
+- **Password:** Random password shown in container logs
+
+⚠️ **Important:**
+- Password is **only shown once** on first startup
+- View with: `docker logs abag | grep Password`
+- Change password immediately after first login!
 
 ## Data Persistence
 
-The container uses a single volume for all persistent data:
+The container uses a single volume for all data:
 
-- `abag_storage`: Entire storage directory (mounted at `/app/storage`)
-  - `storage/database.sqlite` - SQLite database
-  - `storage/app` - User-uploaded files (gift images, etc.)
-  - `storage/framework` - Cache, sessions, compiled views (rebuilt on start, harmless to persist)
-  - `storage/logs` - Empty (logs go to stdout/stderr)
-
-**Logging:**
-- Application logs are sent to stdout/stderr (not files)
-- View logs with `docker logs abag`
-- `storage/logs` directory exists but remains empty
-
-This simplified approach:
-- Single volume to manage
-- Database and uploads together
-- Easy backups (just backup the volume)
-- Framework cache persists across restarts (minor performance benefit)
-
-### Backing Up Data
-
-To backup all your data, backup the `abag_storage` volume:
-
-```bash
-# Create a backup
-docker run --rm -v abag_storage:/source -v $(pwd):/backup alpine tar czf /backup/abag-backup-$(date +%Y%m%d).tar.gz -C /source .
-
-# Restore from backup
-docker run --rm -v abag_storage:/target -v $(pwd):/backup alpine sh -c "cd /target && tar xzf /backup/abag-backup-YYYYMMDD.tar.gz"
 ```
+/app/storage/
+├── database.sqlite    # SQLite database
+├── app/               # User uploads (gift images, profile pictures)
+├── framework/         # Cache and sessions (files, not database)
+├── logs/              # Application logs (also sent to stdout)
+└── caddy/             # Caddy server storage (configs, locks, etc.)
+```
+
+**What's stored where:**
+- **Database:** SQLite file (easily switchable to PostgreSQL/MySQL)
+- **Cache:** File-based (not database - better performance)
+- **Sessions:** File-based (not database - better performance)
+- **Queue:** Database (for reliable job processing)
 
 ## Updating
 
-1. Pull the latest image:
-
+1. Pull latest image:
 ```bash
 docker pull ghcr.io/indemnity83/always-bring-a-gift:latest
 ```
 
-2. Recreate the container:
-
+2. Recreate container:
 ```bash
-docker-compose -f docker-compose.prod.yml up -d
+docker compose up -d
+# or
+docker stop abag && docker rm abag && docker run ...
 ```
 
-The entrypoint scripts will automatically run migrations on container start.
+Migrations run automatically on container start - no manual intervention needed.
 
-**How the entrypoint works:**
-1. `docker-entrypoint.sh` runs as root to create directories and set permissions (using PUID/PGID) and handle all Laravel operations (migrations, seeding, caching, etc.) it then uses su-exec to actually start the built in laravel web server as $PUID:$PGID
-3. No system users are created - everything uses numeric UIDs/GIDs directly
+## How It Works
 
-## Building from Source
+**Container Architecture:**
+- **Base Image:** Debian-based FrankenPHP (not Alpine, for better performance)
+- **Web Server:** FrankenPHP (production-grade, multi-threaded)
+- **Process Manager:** `gosu` drops privileges to PUID:PGID after setup
+- **Multi-stage Build:** Minimal runtime image (no build tools, no Node.js)
 
-The Dockerfile uses a multi-stage build to minimize the final image size:
-- Stage 1: Installs PHP dependencies with Composer (discarded after build)
-- Stage 2: Builds frontend assets with Node.js (discarded after build)
-- Stage 3: Final runtime image with only necessary files
+**Startup Process:**
+1. Entrypoint runs as root to create directories
+2. Fixes ownership to match PUID:PGID
+3. Runs Laravel setup (migrations, seeding, cache optimization)
+4. Drops to PUID:PGID and starts FrankenPHP
 
-```bash
-docker build -t always-bring-a-gift:local .
-```
-
-The final image contains:
-- PHP runtime only (no Node.js, no Composer, no build tools)
-- Compiled frontend assets
-- PHP vendor dependencies
-- Application code
-
-This results in a much smaller and more secure production image.
-
-## Troubleshooting
-
-### View logs
-
-Application logs are sent to stdout/stderr and can be viewed with:
-
-```bash
-# Follow logs in real-time
-docker logs -f abag
-
-# View last 100 lines
-docker logs --tail 100 abag
-
-# View logs since 1 hour ago
-docker logs --since 1h abag
-```
-
-### Access container shell
-
-```bash
-docker exec -it abag sh
-```
-
-### Reset admin password
-
-```bash
-docker exec -it abag php artisan tinker
-# Then run: User::where('email', 'admin@example.com')->first()->update(['password' => Hash::make('newpassword')])
-```
-
-## Security Recommendations
-
-1. **Change default passwords**: Always change the default admin password on first login
-2. **Use HTTPS**: Run behind a reverse proxy (nginx, Traefik, Caddy) with SSL/TLS
-3. **Regular backups**: Backup the Docker volume regularly
-4. **Keep updated**: Pull the latest image regularly for security updates
+**Performance Optimizations:**
+- Debian (glibc) instead of Alpine (musl) for multi-threaded performance
+- File-based sessions/cache instead of database (reduces SQLite contention)
+- FrankenPHP instead of php artisan serve (production-ready)
+- Optimized environment variables (`GODEBUG=cgocheck=0`, `GOMEMLIMIT`)
 
 ## Production Deployment
 
-For production, use a reverse proxy with SSL:
+### Behind Reverse Proxy (Recommended)
 
+**Traefik Example:**
 ```yaml
 services:
-  app:
-    # ... your config
+  abag:
+    image: ghcr.io/indemnity83/always-bring-a-gift:latest
+    volumes:
+      - abag-data:/app/storage
     environment:
       - APP_URL=https://gifts.example.com
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.abag.rule=Host(`gifts.example.com`)"
       - "traefik.http.routers.abag.tls.certresolver=letsencrypt"
+      - "traefik.http.services.abag.loadbalancer.server.port=8000"
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+
+volumes:
+  abag-data:
 ```
+
+**Nginx Proxy Manager:**
+1. Add proxy host pointing to `abag:8000`
+2. Enable SSL with Let's Encrypt
+3. Set `APP_URL` to your public domain
+
+**Important for reverse proxies:**
+- Set `APP_URL` if using OAuth/SSO
+- Ensure `X-Forwarded-*` headers are passed (Laravel auto-configures trusted proxies)
+
+## Troubleshooting
+
+### View Logs
+
+**Container logs (FrankenPHP startup and server logs):**
+```bash
+# Follow logs in real-time
+docker logs -f abag
+
+# Last 100 lines
+docker logs --tail 100 abag
+
+# Logs since 1 hour ago
+docker logs --since 1h abag
+```
+
+**Application logs (Laravel errors, info, debug):**
+```bash
+# View most recent Laravel logs
+docker exec abag tail -f /app/storage/logs/laravel.log
+
+# View last 100 lines
+docker exec abag tail -100 /app/storage/logs/laravel.log
+```
+
+### Access Container Shell
+
+```bash
+docker exec -it abag sh
+```
+
+### Reset Admin Password
+
+```bash
+docker exec -it abag php artisan tinker
+```
+Then run:
+```php
+User::where('email', 'admin@example.com')->first()->update(['password' => Hash::make('newpassword')]);
+```
+
+### Permission Issues
+
+If you see permission errors:
+1. Check PUID/PGID match your host user
+2. Verify volume ownership: `docker exec abag ls -la /app/storage`
+3. Fix manually if needed: `docker exec abag chown -R 1000:1000 /app/storage`
+
+### Assets Not Loading
+
+Assets are auto-detected from the HTTP request, so this should work automatically. If you have issues:
+1. Check you're not setting `ASSET_URL` (removed - not needed)
+2. Verify reverse proxy passes Host header correctly
+3. Check browser console for the actual asset URLs
+
+### Performance Issues
+
+If the app feels slow:
+1. Verify using Debian image (not Alpine) - check with `docker image inspect`
+2. Check logs aren't showing errors
+3. Verify not hitting SQLite locks (cache/sessions should be file-based)
+4. Monitor with `docker stats abag`
+
+## Building from Source
+
+Multi-stage build minimizes final image size:
+
+```bash
+docker build -t always-bring-a-gift:local .
+```
+
+**Build stages:**
+1. **PHP Builder:** Installs Composer dependencies (discarded)
+2. **Frontend Builder:** Builds Vite assets with Node.js (discarded)
+3. **Runtime:** Debian + FrankenPHP + compiled assets only
+
+Final image contains no build tools, resulting in smaller size and better security.
+
+## Security Recommendations
+
+1. ✅ **Change default password** immediately after first login
+2. ✅ **Use HTTPS** via reverse proxy (Traefik, Nginx, Caddy)
+3. ✅ **Regular backups** of the Docker volume
+4. ✅ **Keep updated** - pull latest image regularly
+5. ✅ **Enable 2FA** in user settings for added security
+6. ⚠️ **Don't expose port 8000** directly to internet - use reverse proxy
+
+## Multi-Architecture Support
+
+Images available for:
+- `linux/amd64` (x86_64 - Intel/AMD)
+- `linux/arm64` (ARM64 - Apple Silicon, Raspberry Pi 4+)
+
+Docker automatically pulls the correct architecture.

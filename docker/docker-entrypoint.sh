@@ -3,11 +3,6 @@ set -e
 
 echo "🚀 Starting Always Bring a Gift (ABAG) container..."
 
-if [ -z "$APP_URL" ]; then
-    echo "🛑 Error: The APP_URL environment variable is required."
-    exit 1
-fi
-
 # Ensure storage directory structure exists
 echo "📁 Ensuring storage directory structure..."
 mkdir -p storage/app/public
@@ -21,7 +16,6 @@ mkdir -p storage/caddy
 echo "💻 Setup Environment:"
 php artisan config:clear --quiet
 export APP_TIMEZONE="${TZ:-UTC}"
-export ASSET_URL="$APP_URL"
 php artisan config:show app.env
 php artisan config:show app.debug
 php artisan config:show app.url
