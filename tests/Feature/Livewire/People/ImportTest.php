@@ -131,18 +131,38 @@ test('can parse vcard file', function () {
     $vcard .= "BDAY:19900515\n";
     $vcard .= "NOTE:Loves technology\n";
     $vcard .= "END:VCARD\n";
+    $vcard .= "BEGIN:VCARD\n";
+    $vcard .= "VERSION:3.0\n";
+    $vcard .= "FN;CHARSET=UTF-8:Jane Smith\n";
+    $vcard .= "BDAY:1985-03-22\n";
+    $vcard .= "ANNIVERSARY:20100815\n";
+    $vcard .= "NOTE;CHARSET=UTF-8:Married in 2010\n";
+    $vcard .= "END:VCARD\n";
 
-    $file = UploadedFile::fake()->create('contacts.vcf', strlen($vcard));
+    $file = UploadedFile::fake()->createWithContent('contacts.vcf', $vcard);
 
-    $component = Livewire::actingAs($user)
+    Livewire::actingAs($user)
         ->test(Import::class)
         ->set('csvFile', $file)
-        ->call('parseFile');
+        ->call('parseFile')
+        ->assertSet('showPreview', true);
 
-    // vCard parsing is implemented but requires manual testing with real .vcf files
-    // The fake file upload doesn't preserve extensions properly for validation
-    expect($component->get('showPreview'))->toBeIn([true, false]);
-})->skip('vCard parsing requires manual testing with real files');
+    $parsedPeople = Livewire::actingAs($user)
+        ->test(Import::class)
+        ->set('csvFile', $file)
+        ->call('parseFile')
+        ->get('parsedPeople');
+
+    expect($parsedPeople)->toHaveCount(2);
+    expect($parsedPeople[0]['name'])->toBe('John Doe');
+    expect($parsedPeople[0]['birthday'])->toBe('1990-05-15');
+    expect($parsedPeople[0]['anniversary'])->toBe('');
+    expect($parsedPeople[0]['notes'])->toBe('Loves technology');
+    expect($parsedPeople[1]['name'])->toBe('Jane Smith');
+    expect($parsedPeople[1]['birthday'])->toBe('1985-03-22');
+    expect($parsedPeople[1]['anniversary'])->toBe('2010-08-15');
+    expect($parsedPeople[1]['notes'])->toBe('Married in 2010');
+});
 
 test('can reset import', function () {
     $user = User::factory()->create();

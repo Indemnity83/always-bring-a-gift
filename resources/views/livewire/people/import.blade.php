@@ -88,7 +88,7 @@
                                 <p class="font-semibold text-zinc-900 dark:text-zinc-100">vCard Support:</p>
                                 <p class="text-zinc-600 dark:text-zinc-400">
                                     You can also upload vCard (.vcf) files exported from your contacts app.
-                                    We'll extract name, birthday, and notes automatically.
+                                    We'll extract name, birthday, anniversary, and notes automatically.
                                 </p>
                             </div>
 

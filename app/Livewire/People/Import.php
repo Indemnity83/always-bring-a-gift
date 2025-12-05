@@ -53,7 +53,7 @@ class Import extends Component
     public function parseFile(): void
     {
         $this->validate([
-            'csvFile' => ['required', 'file', 'mimes:csv,txt,vcf', 'max:2048'],
+            'csvFile' => ['required', 'file', 'mimes:csv,txt,vcf,vcard', 'mimetypes:text/csv,text/plain,text/vcard,text/x-vcard,text/directory', 'max:2048'],
         ]);
 
         try {
@@ -144,42 +144,53 @@ class Import extends Component
     {
         $content = file_get_contents($this->csvFile->getRealPath());
 
-        // Split into individual vCards
-        $vcards = preg_split('/END:VCARD\s*/i', $content);
-
         $this->parsedPeople = [];
 
-        foreach ($vcards as $vcard) {
-            if (empty(trim($vcard))) {
+        // Split content into individual vCards manually since Sabre expects one vCard at a time
+        preg_match_all('/BEGIN:VCARD.*?END:VCARD/is', $content, $matches);
+
+        foreach ($matches[0] as $vcardContent) {
+            try {
+                $vcard = \Sabre\VObject\Reader::read($vcardContent, \Sabre\VObject\Reader::OPTION_FORGIVING);
+            } catch (\Exception $e) {
+                // Skip invalid vCards
                 continue;
             }
 
-            $lines = explode("\n", $vcard);
             $person = ['name' => '', 'birthday' => '', 'anniversary' => '', 'notes' => ''];
 
-            foreach ($lines as $line) {
-                $line = trim($line);
+            // Parse Full Name
+            if (isset($vcard->FN)) {
+                $person['name'] = (string) $vcard->FN;
+            }
 
-                // Parse FN (Full Name)
-                if (preg_match('/^FN[;:](.+)$/i', $line, $matches)) {
-                    $person['name'] = trim($matches[1]);
+            // Parse Birthday
+            if (isset($vcard->BDAY)) {
+                $birthday = (string) $vcard->BDAY;
+                // Convert to YYYY-MM-DD format
+                if (preg_match('/^(\d{4})(\d{2})(\d{2})$/', $birthday, $matches)) {
+                    $person['birthday'] = "{$matches[1]}-{$matches[2]}-{$matches[3]}";
+                } elseif (preg_match('/^\d{4}-\d{2}-\d{2}/', $birthday)) {
+                    // Already in correct format or has time component
+                    $person['birthday'] = substr($birthday, 0, 10);
                 }
+            }
 
-                // Parse BDAY (Birthday)
-                if (preg_match('/^BDAY[;:](.+)$/i', $line, $matches)) {
-                    $date = trim($matches[1]);
-                    // Convert YYYYMMDD to YYYY-MM-DD
-                    if (preg_match('/^(\d{4})(\d{2})(\d{2})$/', $date, $dateMatches)) {
-                        $person['birthday'] = "{$dateMatches[1]}-{$dateMatches[2]}-{$dateMatches[3]}";
-                    } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-                        $person['birthday'] = $date;
-                    }
+            // Parse Anniversary
+            if (isset($vcard->ANNIVERSARY)) {
+                $anniversary = (string) $vcard->ANNIVERSARY;
+                // Convert to YYYY-MM-DD format
+                if (preg_match('/^(\d{4})(\d{2})(\d{2})$/', $anniversary, $matches)) {
+                    $person['anniversary'] = "{$matches[1]}-{$matches[2]}-{$matches[3]}";
+                } elseif (preg_match('/^\d{4}-\d{2}-\d{2}/', $anniversary)) {
+                    // Already in correct format or has time component
+                    $person['anniversary'] = substr($anniversary, 0, 10);
                 }
+            }
 
-                // Parse NOTE
-                if (preg_match('/^NOTE[;:](.+)$/i', $line, $matches)) {
-                    $person['notes'] = trim($matches[1]);
-                }
+            // Parse Notes
+            if (isset($vcard->NOTE)) {
+                $person['notes'] = (string) $vcard->NOTE;
             }
 
             if (! empty($person['name'])) {
@@ -191,6 +202,10 @@ class Import extends Component
                 $person['anniversary_budget'] = null;
                 $this->parsedPeople[] = $person;
             }
+        }
+
+        if (empty($this->parsedPeople)) {
+            $this->addError('csvFile', 'No valid vCards found in the file.');
         }
     }
 
