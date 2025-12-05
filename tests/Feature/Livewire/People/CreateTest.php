@@ -35,6 +35,19 @@ test('can create person with birthday', function () {
         ->and($person->birthday->format('Y-m-d'))->toBe('1990-05-15');
 });
 
+test('can create person with anniversary', function () {
+    Livewire::test(Create::class)
+        ->set('name', 'John and Jane Smith')
+        ->set('anniversary', '2015-06-20')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $person = Person::where('name', 'John and Jane Smith')->first();
+    expect($person)
+        ->not->toBeNull()
+        ->and($person->anniversary->format('Y-m-d'))->toBe('2015-06-20');
+});
+
 test('can create person with birthday event', function () {
     EventType::factory()->create(['name' => 'Birthday']);
 
@@ -54,6 +67,28 @@ test('can create person with birthday event', function () {
         ->and($event->eventType->name)->toBe('Birthday')
         ->and($event->is_annual)->toBeTrue()
         ->and($event->date->format('Y-m-d'))->toBe('1985-03-20');
+});
+
+test('can create person with anniversary event', function () {
+    EventType::factory()->create(['name' => 'Anniversary']);
+
+    Livewire::test(Create::class)
+        ->set('name', 'Robert and Sarah')
+        ->set('anniversary', '2010-08-14')
+        ->set('create_anniversary_event', true)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $person = Person::where('name', 'Robert and Sarah')->first();
+    expect($person)->not->toBeNull();
+
+    $event = Event::where('person_id', $person->id)->first();
+    expect($event)
+        ->not->toBeNull()
+        ->and($event->eventType->name)->toBe('Anniversary')
+        ->and($event->is_annual)->toBeTrue()
+        ->and($event->show_milestone)->toBeTrue()
+        ->and($event->date->format('Y-m-d'))->toBe('2010-08-14');
 });
 
 test('can create person with christmas event', function () {
@@ -118,12 +153,37 @@ test('birthday event requires birthday date', function () {
     expect($event)->toBeNull();
 });
 
+test('anniversary event requires anniversary date', function () {
+    EventType::factory()->create(['name' => 'Anniversary']);
+
+    Livewire::test(Create::class)
+        ->set('name', 'Test Couple')
+        ->set('create_anniversary_event', true)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $person = Person::where('name', 'Test Couple')->first();
+    expect($person)->not->toBeNull();
+
+    // Should not create anniversary event without anniversary date
+    $event = Event::where('person_id', $person->id)->first();
+    expect($event)->toBeNull();
+});
+
 test('validates birthday is not in future', function () {
     Livewire::test(Create::class)
         ->set('name', 'Future Person')
         ->set('birthday', now()->addYear()->format('Y-m-d'))
         ->call('save')
         ->assertHasErrors(['birthday' => 'before_or_equal']);
+});
+
+test('validates anniversary is not in future', function () {
+    Livewire::test(Create::class)
+        ->set('name', 'Future Couple')
+        ->set('anniversary', now()->addYear()->format('Y-m-d'))
+        ->call('save')
+        ->assertHasErrors(['anniversary' => 'before_or_equal']);
 });
 
 test('requires name', function () {

@@ -26,6 +26,7 @@ Route::middleware(['auth'])->group(function () {
     // People routes
     Route::get('people', People\Index::class)->name('people.index');
     Route::get('people/create', People\Create::class)->name('people.create');
+    Route::get('people/import', People\Import::class)->name('people.import');
     Route::get('people/{person}', People\Show::class)->name('people.show');
     Route::get('people/{person}/edit', People\Edit::class)->name('people.edit');
 

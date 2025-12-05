@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('profile_picture')->nullable();
             $table->date('birthday')->nullable();
+            $table->date('anniversary')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

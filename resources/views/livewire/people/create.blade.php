@@ -24,6 +24,8 @@
 
         <flux:input wire:model="birthday" label="Birthday (Optional)" type="date" />
 
+        <flux:input wire:model="anniversary" label="Anniversary (Optional)" type="date" />
+
         <div class="space-y-4">
             <div class="space-y-2">
                 <flux:checkbox wire:model.live="create_birthday_event" label="Create annual Birthday event" />
@@ -31,6 +33,20 @@
                     <flux:input
                         wire:model="birthday_target_value"
                         label="Birthday Budget"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="100.00"
+                    />
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <flux:checkbox wire:model.live="create_anniversary_event" label="Create annual Anniversary event" />
+                <div x-show="$wire.create_anniversary_event" x-transition class="pl-6">
+                    <flux:input
+                        wire:model="anniversary_target_value"
+                        label="Anniversary Budget"
                         type="number"
                         step="0.01"
                         min="0"

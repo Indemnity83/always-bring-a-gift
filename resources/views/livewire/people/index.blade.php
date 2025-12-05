@@ -4,9 +4,14 @@
             <flux:heading size="xl">People</flux:heading>
             <flux:subheading>Manage the people you give gifts to</flux:subheading>
         </div>
-        <flux:button variant="primary" href="{{ route('people.create') }}" icon="plus" wire:navigate class="w-full sm:w-auto">
-            Add Person
-        </flux:button>
+        <div class="flex gap-2 flex-wrap sm:flex-nowrap">
+            <flux:button variant="outline" href="{{ route('people.import') }}" icon="arrow-up-tray" wire:navigate class="flex-1 sm:flex-none">
+                Import CSV
+            </flux:button>
+            <flux:button variant="primary" href="{{ route('people.create') }}" icon="plus" wire:navigate class="flex-1 sm:flex-none">
+                Add Person
+            </flux:button>
+        </div>
     </div>
 
     <div class="max-w-md">
