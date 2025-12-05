@@ -121,6 +121,7 @@ class Import extends Component
                     'birthday' => trim($row[$columns['birthday'] ?? ''] ?? ''),
                     'anniversary' => trim($row[$columns['anniversary'] ?? ''] ?? ''),
                     'notes' => trim($row[$columns['notes'] ?? ''] ?? ''),
+                    'photo_data' => null,
                     'add_birthday' => false,
                     'birthday_budget' => null,
                     'add_christmas' => false,
@@ -157,7 +158,7 @@ class Import extends Component
                 continue;
             }
 
-            $person = ['name' => '', 'birthday' => '', 'anniversary' => '', 'notes' => ''];
+            $person = ['name' => '', 'birthday' => '', 'anniversary' => '', 'notes' => '', 'photo_data' => null];
 
             // Parse Full Name
             if (isset($vcard->FN)) {
@@ -191,6 +192,38 @@ class Import extends Component
             // Parse Notes
             if (isset($vcard->NOTE)) {
                 $person['notes'] = (string) $vcard->NOTE;
+            }
+
+            // Parse Photo
+            if (isset($vcard->PHOTO)) {
+                try {
+                    // Get the image data - sabre/vobject automatically decodes base64
+                    $photoData = $vcard->PHOTO->getValue();
+
+                    if (! empty($photoData)) {
+                        // Detect image type from data
+                        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                        $mimeType = $finfo->buffer($photoData);
+
+                        // Only accept common image types
+                        if (in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'])) {
+                            // Save photo immediately to avoid JSON serialization issues
+                            $extension = match ($mimeType) {
+                                'image/jpeg' => 'jpg',
+                                'image/png' => 'png',
+                                'image/gif' => 'gif',
+                                'image/webp' => 'webp',
+                                default => 'jpg',
+                            };
+
+                            $filename = 'profile-pictures/'.uniqid().'.'.$extension;
+                            \Storage::disk('public')->put($filename, $photoData);
+                            $person['photo_data'] = $filename; // Store path, not binary data
+                        }
+                    }
+                } catch (\Exception $e) {
+                    // Skip invalid photos
+                }
             }
 
             if (! empty($person['name'])) {
@@ -298,6 +331,7 @@ class Import extends Component
                         'birthday' => $personData['birthday'] ?: null,
                         'anniversary' => $personData['anniversary'] ?: null,
                         'notes' => $personData['notes'] ?: null,
+                        'profile_picture' => $personData['photo_data'] ?: null,
                     ]
                 );
 

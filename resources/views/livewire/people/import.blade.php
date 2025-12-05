@@ -88,7 +88,7 @@
                                 <p class="font-semibold text-zinc-900 dark:text-zinc-100">vCard Support:</p>
                                 <p class="text-zinc-600 dark:text-zinc-400">
                                     You can also upload vCard (.vcf) files exported from your contacts app.
-                                    We'll extract name, birthday, anniversary, and notes automatically.
+                                    We'll extract name, birthday, anniversary, notes, and profile pictures automatically.
                                 </p>
                             </div>
 
@@ -298,7 +298,7 @@
                                             <div class="flex items-center gap-2">
                                                 <flux:checkbox
                                                     wire:model.live="parsedPeople.{{ $index }}.add_birthday"
-                                                    :disabled="!$person['birthday']"
+                                                    @disabled(!$person['birthday'])
                                                 />
                                                 <input
                                                     wire:model.live="parsedPeople.{{ $index }}.birthday_budget"
@@ -306,7 +306,7 @@
                                                     step="0.01"
                                                     min="0"
                                                     placeholder="$"
-                                                    :disabled="!$person['add_birthday'] || !$person['birthday']"
+                                                    @disabled(!$person['add_birthday'] || !$person['birthday'])
                                                     class="w-20 px-2 py-1 text-xs border-b-2 border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                 />
                                             </div>
@@ -322,7 +322,7 @@
                                                     step="0.01"
                                                     min="0"
                                                     placeholder="$"
-                                                    :disabled="!$person['add_christmas']"
+                                                    @disabled(!$person['add_christmas'])
                                                     class="w-20 px-2 py-1 text-xs border-b-2 border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                 />
                                             </div>
@@ -331,7 +331,7 @@
                                             <div class="flex items-center gap-2">
                                                 <flux:checkbox
                                                     wire:model.live="parsedPeople.{{ $index }}.add_anniversary"
-                                                    :disabled="!$person['anniversary']"
+                                                    @disabled(!$person['anniversary'])
                                                 />
                                                 <input
                                                     wire:model.live="parsedPeople.{{ $index }}.anniversary_budget"
@@ -339,7 +339,7 @@
                                                     step="0.01"
                                                     min="0"
                                                     placeholder="$"
-                                                    :disabled="!$person['add_anniversary'] || !$person['anniversary']"
+                                                    @disabled(!$person['add_anniversary'] || !$person['anniversary'])
                                                     class="w-20 px-2 py-1 text-xs border-b-2 border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                 />
                                             </div>
