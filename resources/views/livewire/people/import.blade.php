@@ -273,10 +273,15 @@
                                 @foreach ($parsedPeople as $index => $person)
                                     <tr>
                                         <td class="py-3">
-                                            <div>
+                                            <div class="max-w-xs">
                                                 <div class="font-medium text-zinc-900 dark:text-zinc-100">{{ $person['name'] }}</div>
                                                 @if($person['notes'])
-                                                    <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">{{ $person['notes'] }}</div>
+                                                    <div
+                                                        class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 truncate"
+                                                        title="{{ $person['notes'] }}"
+                                                    >
+                                                        {{ $person['notes'] }}
+                                                    </div>
                                                 @endif
                                             </div>
                                         </td>
@@ -298,7 +303,7 @@
                                             <div class="flex items-center gap-2">
                                                 <flux:checkbox
                                                     wire:model.live="parsedPeople.{{ $index }}.add_birthday"
-                                                    @disabled(!$person['birthday'])
+                                                    :disabled="!$person['birthday']"
                                                 />
                                                 <input
                                                     wire:model.live="parsedPeople.{{ $index }}.birthday_budget"
@@ -331,7 +336,7 @@
                                             <div class="flex items-center gap-2">
                                                 <flux:checkbox
                                                     wire:model.live="parsedPeople.{{ $index }}.add_anniversary"
-                                                    @disabled(!$person['anniversary'])
+                                                    :disabled="!$person['anniversary']"
                                                 />
                                                 <input
                                                     wire:model.live="parsedPeople.{{ $index }}.anniversary_budget"
