@@ -75,6 +75,7 @@ ENV DB_CONNECTION=sqlite
 ENV DB_DATABASE=/app/storage/database.sqlite
 ENV LOG_CHANNEL=daily
 ENV LOG_LEVEL=info
+ENV TRUSTED_PROXIES=*
 
 # Use file-based drivers to reduce SQLite contention
 ENV SESSION_DRIVER=file

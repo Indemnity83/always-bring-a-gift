@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use SocialiteProviders\Authentik\Provider as AuthentikProvider;
@@ -31,5 +32,29 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('viewAdmin', function ($user) {
             return $user->is_admin === true;
         });
+
+        $this->setupProxies();
+    }
+
+    private function setupProxies()
+    {
+        TrustProxies::withHeaders(config('trustedproxy.headers'));
+
+        $proxies = config('trustedproxy.proxies');
+
+        if ($proxies === '') {
+            return; // trust none
+        }
+
+        if ($proxies === '*') {
+            TrustProxies::at('*');
+
+            return;
+        }
+
+        TrustProxies::at(collect(explode(',', $proxies))
+            ->map('trim')
+            ->filter()
+            ->all());
     }
 }
