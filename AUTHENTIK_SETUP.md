@@ -178,7 +178,6 @@ TRUSTED_PROXIES=*
 
 ### Users can't register via Authentik
 - This is **expected behavior** - users are auto-created on first SSO login
-- No manual registration is needed
 - User data is synced from Authentik
 
 ### Want to disable traditional login in production?
@@ -192,7 +191,6 @@ TRUSTED_PROXIES=*
 - Use HTTPS in production for redirect URIs
 - Authentik handles password security (app doesn't store passwords for SSO users)
 - Local password authentication still works (for dev or emergency access)
-- Consider disabling registration route in production if using SSO exclusively
 
 ## File Structure
 

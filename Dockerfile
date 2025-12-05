@@ -70,7 +70,6 @@ RUN chmod 755 /usr/local/bin/docker-entrypoint.sh
 
 ENV APP_ENV=production
 ENV APP_DEBUG=false
-ENV APP_REGISTRATION_ENABLED=false
 ENV APP_TIMEZONE=UTC
 ENV DB_CONNECTION=sqlite
 ENV DB_DATABASE=/app/storage/database.sqlite

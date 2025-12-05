@@ -66,7 +66,7 @@ class AuthentikController extends Controller
             $user->email_verified_at = now();
 
             // Only set password if this is a new user
-            if (!$user->exists) {
+            if (! $user->exists) {
                 // Generate random password for OAuth users (they won't use it)
                 $user->password = bcrypt(\Illuminate\Support\Str::random(32));
             }

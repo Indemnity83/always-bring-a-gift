@@ -31,7 +31,6 @@ services:
       - APP_ENV=production
       - APP_DEBUG=false
       - APP_URL=http://localhost:8000
-      - APP_REGISTRATION_ENABLED=false
       - APP_TIMEZONE=UTC
 
       # Database (SQLite by default)

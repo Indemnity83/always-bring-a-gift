@@ -20,19 +20,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Registration
-    |--------------------------------------------------------------------------
-    |
-    | This option controls whether user registration is enabled. When disabled,
-    | the registration route will not be available and registration links
-    | will be hidden from the UI. Useful for homelab/self-hosted setups.
-    |
-    */
-
-    'registration_enabled' => env('APP_REGISTRATION_ENABLED', true),
-
-    /*
-    |--------------------------------------------------------------------------
     | Authentication Guards
     |--------------------------------------------------------------------------
     |
