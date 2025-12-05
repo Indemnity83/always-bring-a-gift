@@ -22,6 +22,12 @@ class Create extends Component
 
     public string $birthday_target_value = '';
 
+    public ?string $anniversary = null;
+
+    public bool $create_anniversary_event = false;
+
+    public string $anniversary_target_value = '';
+
     public bool $create_christmas_event = false;
 
     public string $christmas_target_value = '';
@@ -39,6 +45,9 @@ class Create extends Component
             'birthday' => ['nullable', 'date', 'before_or_equal:today'],
             'create_birthday_event' => ['boolean'],
             'birthday_target_value' => ['nullable', 'numeric', 'min:0'],
+            'anniversary' => ['nullable', 'date', 'before_or_equal:today'],
+            'create_anniversary_event' => ['boolean'],
+            'anniversary_target_value' => ['nullable', 'numeric', 'min:0'],
             'create_christmas_event' => ['boolean'],
             'christmas_target_value' => ['nullable', 'numeric', 'min:0'],
             'notes' => ['nullable', 'string', 'max:5000'],
@@ -53,6 +62,7 @@ class Create extends Component
             'name' => $validated['name'],
             'profile_picture' => $profilePicturePath,
             'birthday' => $validated['birthday'],
+            'anniversary' => $validated['anniversary'],
             'notes' => $validated['notes'],
         ]);
 
@@ -67,6 +77,21 @@ class Create extends Component
                     'show_milestone' => true,
                     'date' => $validated['birthday'],
                     'budget' => $validated['birthday_target_value'] ?: null,
+                ]);
+            }
+        }
+
+        // Create Anniversary event if requested and anniversary is provided
+        if ($validated['create_anniversary_event'] && $validated['anniversary']) {
+            $anniversaryType = EventType::where('name', 'Anniversary')->first();
+            if ($anniversaryType) {
+                Event::create([
+                    'person_id' => $person->id,
+                    'event_type_id' => $anniversaryType->id,
+                    'is_annual' => true,
+                    'show_milestone' => true,
+                    'date' => $validated['anniversary'],
+                    'budget' => $validated['anniversary_target_value'] ?: null,
                 ]);
             }
         }
