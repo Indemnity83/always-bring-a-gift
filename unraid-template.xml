@@ -1,28 +1,93 @@
 <?xml version="1.0"?>
 <Container version="2">
-  <Name>AlwaysBringAGift</Name>
-  <Repository>ghcr.io/indemnity83/always-bring-a-gift:latest</Repository>
-  <Registry>https://ghcr.io</Registry>
-  <Network>bridge</Network>
-  <MyIP/>
-  <Shell>sh</Shell>
-  <Privileged>false</Privileged>
-  <Support>https://github.com/Indemnity83/always-bring-a-gift/issues</Support>
-  <Project>https://github.com/Indemnity83/always-bring-a-gift</Project>
-  <Overview>Always Bring a Gift (ABAG) - Your gift-tracking companion. Keep track of events, people, and gift ideas all in one place.</Overview>
-  <Category>Tools:</Category>
-  <WebUI>http://[IP]:[PORT:8000]</WebUI>
-  <TemplateURL>https://raw.githubusercontent.com/Indemnity83/always-bring-a-gift/main/unraid-template.xml</TemplateURL>
-  <Icon>https://raw.githubusercontent.com/Indemnity83/always-bring-a-gift/main/public/favicon.svg</Icon>
-  <ExtraParams/>
-  <PostArgs/>
-  <CPUset/>
-  <DateInstalled></DateInstalled>
-  <DonateText/>
-  <DonateLink/>
-  <Requires/>
-  <Config Name="WebUI" Target="8000" Default="8000" Mode="tcp" Description="Port for the web interface" Type="Port" Display="always" Required="true" Mask="false">8000</Config>
-  <Config Name="Application Data" Target="/app/storage" Default="/mnt/user/appdata/always-bring-a-gift" Mode="rw" Description="Path to store application data (database, logs, cache)" Type="Path" Display="advanced-hide" Required="true" Mask="false">/mnt/user/appdata/always-bring-a-gift</Config>
-  <Config Name="PUID" Target="PUID" Default="99" Mode="" Description="User ID for file ownership" Type="Variable" Display="advanced-hide" Required="false" Mask="false">99</Config>
-  <Config Name="PGID" Target="PGID" Default="100" Mode="" Description="Group ID for file ownership" Type="Variable" Display="advanced-hide" Required="false" Mask="false">100</Config>
+    <Beta>True</Beta>
+    <Name>AlwaysBringAGift</Name>
+    <Repository>ghcr.io/indemnity83/always-bring-a-gift:latest</Repository>
+    <Registry>https://ghcr.io</Registry>
+    <Network>bridge</Network>
+    <MyIP/>
+    <Shell>sh</Shell>
+    <Privileged>false</Privileged>
+
+    <!-- Optional but recommended metadata -->
+    <Support>https://forums.unraid.net/topic/195608-support-always-bring-a-gift/</Support>
+    <Project>https://github.com/Indemnity83/always-bring-a-gift</Project>
+    <ReadMe>https://github.com/Indemnity83/always-bring-a-gift/blob/main/README.md</ReadMe>
+    <Maintainer>Kyle Klaus (Indemnity83)</Maintainer>
+    <Overview>
+        Always Bring a Gift (ABAG) is a simple, self‑hosted gift‑tracking app
+        designed to help you remember events, track people, and keep ideas
+        organized across holidays, birthdays, and celebrations.
+
+        Manage gift histories, plan ahead, and never forget what you gave—or
+        meant to give—again. Perfect for families, busy schedules, and
+        year‑round planning. (Beta release; features and UI may evolve.)
+    </Overview>
+    <Category>Productivity:</Category>
+    <WebUI>http://[IP]:[PORT:8000]</WebUI>
+    <TemplateURL>https://raw.githubusercontent.com/Indemnity83/always-bring-a-gift/main/unraid-template.xml</TemplateURL>
+    <Icon>https://raw.githubusercontent.com/Indemnity83/always-bring-a-gift/main/public/favicon.svg</Icon>
+
+    <!-- Optional extra fields supported by CA -->
+    <Date>2025-12-05</Date>
+    <ExtraParams/>
+    <PostArgs/>
+    <CPUset/>
+    <DateInstalled></DateInstalled>
+    <DonateText/>
+    <DonateLink/>
+    <Requires/>
+
+    <!-- Port mappings -->
+    <Config Name="WebUI"
+            Target="8000"
+            Default="8000"
+            Mode="tcp"
+            Description="Port for the web interface"
+            Type="Port"
+            Display="always"
+            Required="true"
+            Mask="false">8000</Config>
+
+    <!-- Volume mappings -->
+    <Config Name="Application Data"
+            Target="/app/storage"
+            Default="/mnt/user/appdata/always-bring-a-gift"
+            Mode="rw"
+            Description="Path to store application data (database, logs, cache)"
+            Type="Path"
+            Display="advanced-hide"
+            Required="true"
+            Mask="false">/mnt/user/appdata/always-bring-a-gift</Config>
+
+    <!-- Runtime user/group -->
+    <Config Name="PUID"
+            Target="PUID"
+            Default="99"
+            Mode=""
+            Description="User ID for file ownership"
+            Type="Variable"
+            Display="advanced-hide"
+            Required="false"
+            Mask="false">99</Config>
+
+    <Config Name="PGID"
+            Target="PGID"
+            Default="100"
+            Mode=""
+            Description="Group ID for file ownership"
+            Type="Variable"
+            Display="advanced-hide"
+            Required="false"
+            Mask="false">100</Config>
+
+    <Config Name="TRUSTED_PROXIES"
+            Target="TRUSTED_PROXIES"
+            Default="*"
+            Mode=""
+            Description="The load balancers or proxies that should be trusted"
+            Type="Variable"
+            Display="advanced-hide"
+            Required="false"
+            Mask="false">*</Config>
 </Container>
