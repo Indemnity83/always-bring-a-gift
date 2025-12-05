@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <Container version="2">
-    <Beta>True</Beta>
+    <Beta>true</Beta>
     <Name>AlwaysBringAGift</Name>
     <Repository>ghcr.io/indemnity83/always-bring-a-gift:latest</Repository>
     <Registry>https://ghcr.io</Registry>
