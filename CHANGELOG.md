@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0](https://github.com/Indemnity83/always-bring-a-gift/compare/v0.2.0...v1.0.0) (2025-12-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* The anniversary field has been added into the create_people migration. Existing users upgrading to this version must manually add the anniversary column to their database with: ALTER TABLE people ADD COLUMN anniversary DATE;
+
+### Features
+
+* add bulk import for people with CSV/vCard support ([#30](https://github.com/Indemnity83/always-bring-a-gift/issues/30)) ([0790dd0](https://github.com/Indemnity83/always-bring-a-gift/commit/0790dd0c6bd95cb7aeb23b2cc346ae0c98bd4498))
+
+
+### Bug Fixes
+
+* improve mobile layout responsiveness ([#29](https://github.com/Indemnity83/always-bring-a-gift/issues/29)) ([4ac3454](https://github.com/Indemnity83/always-bring-a-gift/commit/4ac3454794491ee05ed304663442447f0215aa33))
+
+
+### Miscellaneous Chores
+
+* configure release-please for pre-1.0 versioning ([f844b08](https://github.com/Indemnity83/always-bring-a-gift/commit/f844b08d13fd3bbfcbceeef2aca0f2b931f56c7d))
+* remove user registration functionality ([#27](https://github.com/Indemnity83/always-bring-a-gift/issues/27)) ([bf9aa80](https://github.com/Indemnity83/always-bring-a-gift/commit/bf9aa80b96b58ffaa1b68e58cf9be8653c36488c))
+
 ## [0.2.0](https://github.com/Indemnity83/always-bring-a-gift/compare/v0.1.0...v0.2.0) (2025-12-05)
 
 
