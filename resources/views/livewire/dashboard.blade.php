@@ -1,5 +1,5 @@
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <flux:heading size="xl">Upcoming Events</flux:heading>
             <flux:subheading>
@@ -15,13 +15,13 @@
                 @endif
             </flux:subheading>
         </div>
-        <flux:button variant="primary" href="{{ route('people.index') }}" icon="users">
+        <flux:button variant="primary" href="{{ route('people.index') }}" icon="users" class="sm:w-auto w-full">
             Manage People
         </flux:button>
     </div>
 
     {{-- Timeframe Selector --}}
-    <div class="flex gap-2 flex-wrap items-center justify-between">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex gap-2 flex-wrap">
             <flux:button
                 size="sm"
@@ -164,13 +164,14 @@
                         @endif
                     </div>
 
-                    <div class="flex gap-2 pt-4 mt-auto">
+                    <div class="flex flex-col sm:flex-row gap-2 pt-4 mt-auto">
                             @if (!$isCompleted)
                                 <flux:button
                                     size="sm"
                                     variant="primary"
                                     wire:click="openGiftModal({{ $event->id }})"
                                     icon="plus"
+                                    class="w-full sm:w-auto"
                                 >
                                     Add Gift
                                 </flux:button>
@@ -180,7 +181,7 @@
                                 variant="{{ $isCompleted ? 'ghost' : 'outline' }}"
                                 wire:click="toggleCompletion({{ $event->id }})"
                                 icon="{{ $isCompleted ? 'x-mark' : 'check' }}"
-                                class="{{ $isCompleted ? 'flex-1' : '' }}"
+                                class="{{ $isCompleted ? 'flex-1' : 'w-full sm:w-auto' }}"
                             >
                                 {{ $isCompleted ? 'Uncomplete' : 'Complete' }}
                             </flux:button>
@@ -189,7 +190,7 @@
                                 variant="ghost"
                                 href="{{ route('events.show', $event) }}"
                                 icon="arrow-right"
-                                class="{{ $isCompleted ? 'flex-1' : '' }}"
+                                class="{{ $isCompleted ? 'flex-1' : 'w-full sm:w-auto' }}"
                             >
                                 Details
                             </flux:button>

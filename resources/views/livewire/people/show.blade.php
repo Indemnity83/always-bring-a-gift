@@ -1,16 +1,16 @@
 <div class="space-y-8">
-    <div class="flex items-center justify-between">
-        <div>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div class="flex-1">
             <flux:heading size="xl">{{ $person->name }}</flux:heading>
             @if ($person->birthday)
                 <flux:subheading>Birthday: {{ $person->birthday->format('F j, Y') }}</flux:subheading>
             @endif
         </div>
-        <div class="flex gap-2">
-            <flux:button href="{{ route('people.edit', $person) }}" variant="primary" wire:navigate>
+        <div class="flex gap-2 flex-wrap sm:flex-nowrap">
+            <flux:button href="{{ route('people.edit', $person) }}" variant="primary" wire:navigate class="flex-1 sm:flex-none">
                 Edit
             </flux:button>
-            <flux:button href="{{ route('people.index') }}" variant="ghost" wire:navigate>
+            <flux:button href="{{ route('people.index') }}" variant="ghost" wire:navigate class="flex-1 sm:flex-none">
                 Back to List
             </flux:button>
         </div>
@@ -28,9 +28,9 @@
     </div>
 
     <div class="space-y-4">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <flux:heading size="lg">Events</flux:heading>
-            <flux:button href="{{ route('events.create', $person) }}" variant="primary" icon="plus" wire:navigate>
+            <flux:button href="{{ route('events.create', $person) }}" variant="primary" icon="plus" wire:navigate class="w-full sm:w-auto">
                 Add Event
             </flux:button>
         </div>
@@ -40,7 +40,8 @@
                 <strong>No events yet</strong> - Add an event to start tracking gifts for this person.
             </flux:callout>
         @else
-            <div class="overflow-x-auto">
+            {{-- Desktop Table View --}}
+            <div class="hidden sm:block overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="border-b border-zinc-200 dark:border-zinc-700">
                         <tr class="text-left">
@@ -97,6 +98,53 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            {{-- Mobile Card View --}}
+            <div class="sm:hidden space-y-3">
+                @foreach ($person->events as $event)
+                    <div class="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4 space-y-3">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex-1">
+                                <div class="font-semibold text-zinc-900 dark:text-zinc-100">
+                                    {{ $event->eventType->name }}
+                                </div>
+                                <div class="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+                                    {{ $event->date->format('M j, Y') }}
+                                </div>
+                            </div>
+                            @if ($event->is_annual)
+                                <flux:badge variant="primary" size="sm">Annual</flux:badge>
+                            @else
+                                <flux:badge variant="outline" size="sm">One-time</flux:badge>
+                            @endif
+                        </div>
+
+                        @if ($event->budget)
+                            <div class="text-sm">
+                                <span class="text-zinc-600 dark:text-zinc-400">Budget:</span>
+                                <span class="font-medium text-zinc-900 dark:text-zinc-100">${{ number_format($event->budget, 2) }}</span>
+                            </div>
+                        @endif
+
+                        <div class="flex gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-700">
+                            <flux:button size="sm" variant="ghost" href="{{ route('events.edit', $event) }}" wire:navigate class="flex-1">
+                                Edit
+                            </flux:button>
+                            <flux:button size="sm" variant="ghost" href="{{ route('events.show', $event) }}" wire:navigate class="flex-1">
+                                View
+                            </flux:button>
+                            <flux:button
+                                size="sm"
+                                variant="ghost"
+                                icon="trash"
+                                class="hover:text-red-600 dark:hover:text-red-400"
+                                wire:click="deleteEvent({{ $event->id }})"
+                                wire:confirm="Are you sure you want to delete this event? This will also delete all associated gifts."
+                            />
+                        </div>
+                    </div>
+                @endforeach
             </div>
         @endif
     </div>
