@@ -20,6 +20,7 @@ class Person extends Model
         'name',
         'profile_picture',
         'birthday',
+        'anniversary',
         'notes',
     ];
 
@@ -32,6 +33,7 @@ class Person extends Model
     {
         return [
             'birthday' => 'date',
+            'anniversary' => 'date',
         ];
     }
 
