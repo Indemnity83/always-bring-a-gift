@@ -127,6 +127,18 @@ class NotificationSetting extends Model
      */
     public static function forUser(User $user, bool $create = false): ?self
     {
+        if ($user->relationLoaded('notificationSetting')) {
+            $settings = $user->getRelation('notificationSetting');
+
+            if ($settings instanceof self) {
+                return $settings;
+            }
+
+            if (! $create) {
+                return null;
+            }
+        }
+
         if (! $create) {
             return $user->notificationSetting()->first();
         }

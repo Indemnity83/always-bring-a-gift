@@ -44,9 +44,6 @@ class ReminderService
                         continue;
                     }
 
-                    $user->setRelation('notificationSetting', $settings);
-                    $settings->setRelation('user', $user);
-
                     // Respect per-user reminder time; skip until the time has passed.
                     if (! $this->shouldSendNow($settings)) {
                         continue;
@@ -164,25 +161,6 @@ class ReminderService
             });
 
         return $sentCount;
-    }
-
-    /**
-     * Get upcoming events based on the user's lead time.
-     *
-     * @return Collection<int, Event>
-     */
-    protected function upcomingEvents(EloquentCollection $events, NotificationSetting $settings, ?int $overrideDays): Collection
-    {
-        $daysAhead = $overrideDays ?? $settings->lead_time_days ?? config('reminders.lead_time_days');
-
-        $today = now()->startOfDay();
-        $endDate = now()->addDays($daysAhead);
-
-        return $events->filter(function (Event $event) use ($today, $endDate) {
-            $nextOccurrence = $event->next_occurrence;
-
-            return $nextOccurrence->between($today, $endDate, true);
-        });
     }
 
     /**

@@ -179,8 +179,10 @@ class NotificationStatus extends Component
 
     public function getSystemOutagesProperty(): Collection
     {
-        return NotificationOutage::where('is_resolved', false)
-            ->orWhere('ended_at', '>', now()->subDay())
+        return NotificationOutage::where(function ($query) {
+            $query->where('is_resolved', false)
+                ->orWhere('ended_at', '>', now()->subDay());
+        })
             ->latest('started_at')
             ->get();
     }

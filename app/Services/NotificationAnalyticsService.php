@@ -132,11 +132,7 @@ class NotificationAnalyticsService
      */
     protected function calculateAveragePerDay(Collection $logs, Carbon $startDate, Carbon $endDate): float
     {
-        $days = $startDate->diffInDays($endDate);
-
-        if ($days === 0) {
-            return 0.0;
-        }
+        $days = max(1, $startDate->diffInDays($endDate));
 
         return $logs->count() / $days;
     }
