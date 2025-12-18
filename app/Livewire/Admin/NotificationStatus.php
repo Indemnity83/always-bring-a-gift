@@ -199,7 +199,7 @@ class NotificationStatus extends Component
         $warningChannels = 0;
         $criticalChannels = 0;
 
-        foreach ($systemHealth as $channel => $healthChecks) {
+        foreach ($systemHealth as $healthChecks) {
             $latestCheck = $healthChecks->first();
             if ($latestCheck) {
                 if ($latestCheck->isHealthy()) {
