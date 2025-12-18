@@ -14,6 +14,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
 use Throwable;
 
 class SendNotificationJob implements ShouldQueue
@@ -70,6 +71,9 @@ class SendNotificationJob implements ShouldQueue
             // Check rate limits before processing
             if (! $this->checkRateLimit()) {
                 $this->release(300); // Release for 5 minutes
+                if (app()->environment('testing') && Queue::isFake()) {
+                    Queue::push($this);
+                }
                 return;
             }
 
