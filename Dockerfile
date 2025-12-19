@@ -34,7 +34,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 
 # Copy vendor folder from PHP builder (needed for CSS references)
 COPY --from=php-builder /app/vendor ./vendor

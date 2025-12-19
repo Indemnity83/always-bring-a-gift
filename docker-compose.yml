@@ -20,7 +20,7 @@ services:
     container_name: abag
     restart: unless-stopped
     ports:
-      - "8001:8000"
+      - "8000:8000"
     environment:
       # User/Group IDs (for Unraid and similar systems)
       - PUID=1000
