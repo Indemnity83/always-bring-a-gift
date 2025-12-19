@@ -11,6 +11,7 @@ COPY composer.json composer.lock ./
 # Install dependencies (optionally include dev tools for testing images)
 RUN --mount=type=cache,target=/tmp/cache \
     if [ "$INCLUDE_DEV" = "true" ]; then \
+        # Dev builds: ignore PHP platform reqs to allow flexible test environments \
         composer install \
         --optimize-autoloader \
         --no-interaction \
@@ -18,6 +19,7 @@ RUN --mount=type=cache,target=/tmp/cache \
         --no-scripts \
         --ignore-platform-req=php; \
     else \
+        # Production builds: enforce all platform requirements \
         composer install \
         --no-dev \
         --optimize-autoloader \
