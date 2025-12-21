@@ -322,7 +322,7 @@ class Import extends Component
         DB::transaction(function () use (&$importedPeople, &$importedEvents) {
             // Get event types
             $birthdayType = EventType::where('name', 'Birthday')->first();
-            $christmasType = EventType::where('name', 'Christmas')->first();
+            $christmasType = EventType::where('name', EventType::CHRISTMAS_NAME)->first();
             $anniversaryType = EventType::where('name', 'Anniversary')->first();
 
             foreach ($this->parsedPeople as $personData) {
@@ -444,8 +444,7 @@ class Import extends Component
     protected function resolveChristmasDateForPerson(?Person $person): string
     {
         $year = now()->year;
-        $monthDay = $person?->christmas_default_date ?: $this->defaultChristmasMonthDay();
-
-        return sprintf('%04d-%s', $year, $monthDay);
+        return $person?->getChristmasDateForYear($year)
+            ?? sprintf('%04d-%s', $year, $this->defaultChristmasMonthDay());
     }
 }

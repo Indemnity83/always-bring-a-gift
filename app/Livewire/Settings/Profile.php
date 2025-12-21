@@ -93,23 +93,33 @@ class Profile extends Component
      */
     public function getTimezonesProperty(): array
     {
+        static $cachedTimezones = null;
+
+        if ($cachedTimezones !== null) {
+            return $cachedTimezones;
+        }
+
         $timezones = \DateTimeZone::listIdentifiers(\DateTimeZone::ALL);
         $list = [];
 
         foreach ($timezones as $timezone) {
             $parts = explode('/', $timezone, 2);
-            $region = $parts[0];
-            $city = $parts[1] ?? $timezone;
-
-            // Format the display name with region prefix
-            $displayName = $region.' / '.str_replace(['_', '/'], [' ', ' / '], $city);
+            if (count($parts) === 1) {
+                $displayName = $timezone;
+            } else {
+                $region = $parts[0];
+                $city = str_replace(['_', '/'], [' ', ' / '], $parts[1]);
+                $displayName = $region.' / '.$city;
+            }
             $list[$timezone] = $displayName;
         }
 
         // Sort by display name
         asort($list);
 
-        return $list;
+        $cachedTimezones = $list;
+
+        return $cachedTimezones;
     }
 
     /**
@@ -120,18 +130,18 @@ class Profile extends Component
     public function getChristmasMonthsProperty(): array
     {
         return [
-            1 => 'January',
-            2 => 'February',
-            3 => 'March',
-            4 => 'April',
-            5 => 'May',
-            6 => 'June',
-            7 => 'July',
-            8 => 'August',
-            9 => 'September',
-            10 => 'October',
-            11 => 'November',
-            12 => 'December',
+            1 => __('January'),
+            2 => __('February'),
+            3 => __('March'),
+            4 => __('April'),
+            5 => __('May'),
+            6 => __('June'),
+            7 => __('July'),
+            8 => __('August'),
+            9 => __('September'),
+            10 => __('October'),
+            11 => __('November'),
+            12 => __('December'),
         ];
     }
 
@@ -142,8 +152,11 @@ class Profile extends Component
      */
     public function getChristmasDaysProperty(): array
     {
+        $month = $this->christmasMonth ?: 12;
+        $date = \DateTime::createFromFormat('Y-m-d', sprintf('2000-%02d-01', $month));
+        $daysInMonth = $date ? (int) $date->format('t') : 31;
         $days = [];
-        for ($day = 1; $day <= 31; $day++) {
+        for ($day = 1; $day <= $daysInMonth; $day++) {
             $days[$day] = (string) $day;
         }
 

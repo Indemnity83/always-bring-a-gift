@@ -45,7 +45,7 @@ class Create extends Component
 
         $eventType = EventType::find($eventTypeId);
 
-        if ($eventType && $eventType->name === 'Christmas') {
+        if ($eventType && $eventType->name === EventType::CHRISTMAS_NAME) {
             $this->date = $this->resolveChristmasDate();
         }
     }
@@ -85,10 +85,6 @@ class Create extends Component
     protected function resolveChristmasDate(): string
     {
         $year = now()->year;
-        $monthDay = $this->person->christmas_default_date
-            ?? $this->person->user?->getChristmasDefaultDate()
-            ?? config('reminders.christmas_default_date', '12-25');
-
-        return sprintf('%04d-%s', $year, $monthDay);
+        return $this->person->getChristmasDateForYear($year);
     }
 }

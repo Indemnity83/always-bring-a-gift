@@ -47,9 +47,9 @@ class Create extends Component
             ? $user->getChristmasDefaultDate()
             : config('reminders.christmas_default_date', '12-25');
 
-        [$month, $day] = array_map('intval', explode('-', $monthDay));
-        $this->christmas_month = $month;
-        $this->christmas_day = $day;
+        $parts = explode('-', $monthDay);
+        $this->christmas_month = isset($parts[0]) ? (int) $parts[0] : 12;
+        $this->christmas_day = isset($parts[1]) ? (int) $parts[1] : 25;
     }
 
     /**
@@ -129,7 +129,7 @@ class Create extends Component
 
         // Create Christmas event if requested
         if ($validated['create_christmas_event']) {
-            $christmasType = EventType::where('name', 'Christmas')->first();
+            $christmasType = EventType::where('name', EventType::CHRISTMAS_NAME)->first();
             if ($christmasType) {
                 Event::create([
                     'person_id' => $person->id,
@@ -157,10 +157,7 @@ class Create extends Component
     protected function resolveChristmasDateForPerson(Person $person): string
     {
         $year = now()->year;
-        $monthDay = $person->christmas_default_date
-            ?: config('reminders.christmas_default_date', '12-25');
-
-        return sprintf('%04d-%s', $year, $monthDay);
+        return $person->getChristmasDateForYear($year);
     }
 
     /**

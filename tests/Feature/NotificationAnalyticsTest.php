@@ -8,6 +8,22 @@ use App\Models\Person;
 use App\Models\User;
 use App\Services\NotificationAnalyticsService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\Sequence;
+
+function createNotificationLogs(int $count, array $attributes = []): void
+{
+    $sequence = [];
+    for ($index = 0; $index < $count; $index++) {
+        $sequence[] = [
+            'remind_for_date' => now()->subDays($index + 1)->toDateString(),
+        ];
+    }
+
+    EventNotificationLog::factory()
+        ->count($count)
+        ->state(new Sequence(...$sequence))
+        ->create($attributes);
+}
 
 beforeEach(function () {
     // Set test time for consistent analytics
@@ -30,7 +46,7 @@ test('notification analytics service provides user analytics correctly', functio
     ]);
 
     // Create notification logs for the user
-    EventNotificationLog::factory()->count(5)->create([
+    createNotificationLogs(5, [
         'user_id' => $user->id,
         'event_id' => $event->id,
         'channel' => 'mail',
@@ -68,7 +84,7 @@ test('notification analytics service provides system analytics correctly', funct
         ]);
 
         // Create notification logs for each user
-        EventNotificationLog::factory()->count(2)->create([
+        createNotificationLogs(2, [
             'user_id' => $user->id,
             'event_id' => $event->id,
             'channel' => 'mail',
@@ -98,7 +114,7 @@ test('notification analytics service handles custom date ranges', function () {
     ]);
 
     // Create notification logs within specific date range
-    EventNotificationLog::factory()->count(3)->create([
+    createNotificationLogs(3, [
         'user_id' => $user->id,
         'event_id' => $event->id,
         'channel' => 'mail',
@@ -141,21 +157,21 @@ test('notification analytics service provides channel breakdown correctly', func
     ]);
 
     // Create notification logs for different channels
-    EventNotificationLog::factory()->count(3)->create([
+    createNotificationLogs(3, [
         'user_id' => $user->id,
         'event_id' => $event->id,
         'channel' => 'mail',
         'sent_at' => now()->subDays(rand(1, 30)),
     ]);
 
-    EventNotificationLog::factory()->count(2)->create([
+    createNotificationLogs(2, [
         'user_id' => $user->id,
         'event_id' => $event->id,
         'channel' => 'slack',
         'sent_at' => now()->subDays(rand(1, 30)),
     ]);
 
-    EventNotificationLog::factory()->count(1)->create([
+    createNotificationLogs(1, [
         'user_id' => $user->id,
         'event_id' => $event->id,
         'channel' => 'discord',
@@ -188,13 +204,15 @@ test('notification analytics service provides daily breakdown correctly', functi
         'event_id' => $event->id,
         'channel' => 'mail',
         'sent_at' => now()->subDays(5),
+        'remind_for_date' => now()->subDays(5)->toDateString(),
     ]);
 
     EventNotificationLog::factory()->create([
         'user_id' => $user->id,
         'event_id' => $event->id,
-        'channel' => 'mail',
+        'channel' => 'slack',
         'sent_at' => now()->subDays(5),
+        'remind_for_date' => now()->subDays(5)->toDateString(),
     ]);
 
     EventNotificationLog::factory()->create([
@@ -202,6 +220,7 @@ test('notification analytics service provides daily breakdown correctly', functi
         'event_id' => $event->id,
         'channel' => 'mail',
         'sent_at' => now()->subDays(3),
+        'remind_for_date' => now()->subDays(3)->toDateString(),
     ]);
 
     $analytics = $service->getUserAnalytics($user);
@@ -224,7 +243,7 @@ test('notification analytics service calculates success rate correctly', functio
     ]);
 
     // Create notification logs (all successful by default)
-    EventNotificationLog::factory()->count(5)->create([
+    createNotificationLogs(5, [
         'user_id' => $user->id,
         'event_id' => $event->id,
         'channel' => 'mail',
@@ -248,7 +267,7 @@ test('notification analytics service calculates average per day correctly', func
     ]);
 
     // Create 10 notification logs over 30 days
-    EventNotificationLog::factory()->count(10)->create([
+    createNotificationLogs(10, [
         'user_id' => $user->id,
         'event_id' => $event->id,
         'channel' => 'mail',
@@ -272,18 +291,19 @@ test('notification analytics service identifies most active day correctly', func
     ]);
 
     // Create notification logs with different frequencies
-    EventNotificationLog::factory()->count(3)->create([
+    createNotificationLogs(3, [
         'user_id' => $user->id,
         'event_id' => $event->id,
         'channel' => 'mail',
         'sent_at' => now()->subDays(5),
     ]);
 
-    EventNotificationLog::factory()->count(1)->create([
+    EventNotificationLog::factory()->create([
         'user_id' => $user->id,
         'event_id' => $event->id,
         'channel' => 'mail',
         'sent_at' => now()->subDays(3),
+        'remind_for_date' => now()->subDays(10)->toDateString(),
     ]);
 
     $analytics = $service->getUserAnalytics($user);
@@ -326,21 +346,21 @@ test('notification analytics service provides top users correctly', function () 
     ]);
 
     // Create different numbers of notification logs for each user
-    EventNotificationLog::factory()->count(5)->create([
+    createNotificationLogs(5, [
         'user_id' => $users[0]->id,
         'event_id' => $event->id,
         'channel' => 'mail',
         'sent_at' => now()->subDays(rand(1, 30)),
     ]);
 
-    EventNotificationLog::factory()->count(3)->create([
+    createNotificationLogs(3, [
         'user_id' => $users[1]->id,
         'event_id' => $event->id,
         'channel' => 'mail',
         'sent_at' => now()->subDays(rand(1, 30)),
     ]);
 
-    EventNotificationLog::factory()->count(1)->create([
+    createNotificationLogs(1, [
         'user_id' => $users[2]->id,
         'event_id' => $event->id,
         'channel' => 'mail',
@@ -402,14 +422,14 @@ test('notification analytics service provides growth trend correctly', function 
     ]);
 
     // Create notification logs for different days
-    EventNotificationLog::factory()->count(2)->create([
+    createNotificationLogs(2, [
         'user_id' => $users[0]->id,
         'event_id' => $event->id,
         'channel' => 'mail',
         'sent_at' => now()->subDays(5),
     ]);
 
-    EventNotificationLog::factory()->count(1)->create([
+    createNotificationLogs(1, [
         'user_id' => $users[1]->id,
         'event_id' => $event->id,
         'channel' => 'mail',
@@ -436,7 +456,7 @@ test('notification analytics service provides time-based stats correctly', funct
     ]);
 
     // Create notification logs for today
-    EventNotificationLog::factory()->count(2)->create([
+    createNotificationLogs(2, [
         'user_id' => $users[0]->id,
         'event_id' => $event->id,
         'channel' => 'mail',
@@ -460,7 +480,7 @@ test('notification analytics service provides comparative analytics correctly', 
     ]);
 
     // Create notification logs for period 1
-    EventNotificationLog::factory()->count(4)->create([
+    createNotificationLogs(4, [
         'user_id' => $users[0]->id,
         'event_id' => $event->id,
         'channel' => 'mail',
@@ -468,7 +488,7 @@ test('notification analytics service provides comparative analytics correctly', 
     ]);
 
     // Create notification logs for period 2
-    EventNotificationLog::factory()->count(2)->create([
+    createNotificationLogs(2, [
         'user_id' => $users[1]->id,
         'event_id' => $event->id,
         'channel' => 'mail',

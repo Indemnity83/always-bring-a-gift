@@ -61,7 +61,7 @@
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <flux:select wire:model="christmas_month" label="Christmas Month">
                             @foreach (range(1, 12) as $month)
-                                <option value="{{ $month }}">{{ $month }}</option>
+                                <option value="{{ $month }}">{{ \DateTime::createFromFormat('!m', $month)->format('F') }}</option>
                             @endforeach
                         </flux:select>
                         <flux:select wire:model="christmas_day" label="Christmas Day">
@@ -70,6 +70,10 @@
                             @endforeach
                         </flux:select>
                     </div>
+                    <p class="text-sm text-zinc-600 dark:text-zinc-400">Used as the default when creating Christmas events.</p>
+                    @error('christmas_month')
+                        <flux:error>{{ $message }}</flux:error>
+                    @enderror
                     @error('christmas_day')
                         <flux:error>{{ $message }}</flux:error>
                     @enderror

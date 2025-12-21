@@ -79,6 +79,11 @@ class SendNotificationJob implements ShouldQueue
                 return;
             }
 
+            $log = $this->reserveNotificationLog();
+            if (! $log) {
+                return;
+            }
+
             // Send the notification
             if ($this->shouldSimulateFailure()) {
                 throw new \Exception('Simulated notification failure.');
@@ -89,14 +94,7 @@ class SendNotificationJob implements ShouldQueue
             // Log successful delivery
             $this->logDelivery($startTime, 'success');
 
-            // Record in database to prevent duplicate sends
-            EventNotificationLog::create([
-                'event_id' => $this->eventId,
-                'user_id' => $this->user->id,
-                'channel' => $this->channel,
-                'remind_for_date' => $this->occurrenceDate->toDateString(),
-                'sent_at' => now(),
-            ]);
+            $log->forceFill(['sent_at' => now()])->save();
 
             // Update rate limit tracking
             $this->updateRateLimit(true);
@@ -124,25 +122,67 @@ class SendNotificationJob implements ShouldQueue
             'action' => 'send_notification',
         ]);
 
-        // If blocked, check if block period has expired
-        if ($rateLimit->is_blocked && $rateLimit->reset_at && $rateLimit->reset_at->isFuture()) {
-            $this->safeLog('info', 'Notification blocked by rate limit', [
-                'user_id' => $this->user->id,
-                'channel' => $this->channel,
-                'reset_at' => $rateLimit->reset_at,
-            ]);
+        if ($rateLimit->is_blocked) {
+            if (! $rateLimit->reset_at) {
+                $this->safeLog('warning', 'Notification rate limit blocked without reset_at', [
+                    'user_id' => $this->user->id,
+                    'channel' => $this->channel,
+                ]);
 
-            return false;
-        }
+                return false;
+            }
 
-        // Reset block if period has expired
-        if ($rateLimit->is_blocked && $rateLimit->reset_at && $rateLimit->reset_at->isPast()) {
+            if ($rateLimit->reset_at->isFuture()) {
+                $this->safeLog('info', 'Notification blocked by rate limit', [
+                    'user_id' => $this->user->id,
+                    'channel' => $this->channel,
+                    'reset_at' => $rateLimit->reset_at,
+                ]);
+
+                return false;
+            }
+
             $rateLimit->is_blocked = false;
             $rateLimit->attempts = 0;
             $rateLimit->save();
         }
 
         return true;
+    }
+
+    protected function reserveNotificationLog(): ?EventNotificationLog
+    {
+        try {
+            return EventNotificationLog::firstOrCreate(
+                [
+                    'event_id' => $this->eventId,
+                    'user_id' => $this->user->id,
+                    'channel' => $this->channel,
+                    'remind_for_date' => $this->occurrenceDate->toDateString(),
+                ],
+                [
+                    'sent_at' => null,
+                ]
+            );
+        } catch (\Illuminate\Database\QueryException $exception) {
+            $log = EventNotificationLog::where('event_id', $this->eventId)
+                ->where('user_id', $this->user->id)
+                ->where('channel', $this->channel)
+                ->whereDate('remind_for_date', $this->occurrenceDate->toDateString())
+                ->first();
+
+            if ($log?->sent_at) {
+                $this->safeLog('info', 'Notification already sent, skipping', [
+                    'user_id' => $this->user->id,
+                    'event_id' => $this->eventId,
+                    'channel' => $this->channel,
+                ]);
+
+                return null;
+            }
+
+            return $log;
+        }
     }
 
     /**
@@ -180,14 +220,14 @@ class SendNotificationJob implements ShouldQueue
      */
     protected function logDelivery(Carbon $startTime, string $status, ?Throwable $exception = null): void
     {
-        $deliveryTime = now()->diffInSeconds($startTime);
+        $deliveryTimeMs = (int) round(now()->diffInMilliseconds($startTime));
 
         $logData = [
             'user_id' => $this->user->id,
             'event_id' => $this->eventId,
             'channel' => $this->channel,
             'status' => $status,
-            'delivery_time_ms' => $deliveryTime * 1000,
+            'delivery_time_ms' => $deliveryTimeMs,
             'occurrence_date' => $this->occurrenceDate->toDateString(),
         ];
 
@@ -233,18 +273,27 @@ class SendNotificationJob implements ShouldQueue
             $rateLimit->reset_at = now()->addMinutes($windowMinutes);
         }
 
-        if (! $success) {
-            $rateLimit->last_attempt_at = now();
-            $rateLimit->attempts++;
-
-            $isFinalAttempt = $this->attempts() >= $this->tries;
-            if ($config && $isFinalAttempt && $rateLimit->attempts >= $config->max_attempts) {
-                $rateLimit->is_blocked = true;
-                $rateLimit->reset_at = now()->addMinutes($config->block_duration_minutes);
-            }
-
+        if ($success) {
+            $rateLimit->attempts = 0;
+            $rateLimit->last_attempt_at = null;
+            $rateLimit->is_blocked = false;
+            $rateLimit->reset_at = now()->addMinutes($windowMinutes);
             $rateLimit->save();
+
+            return;
         }
+
+        $rateLimit->last_attempt_at = now();
+        $rateLimit->attempts++;
+
+        // Only block if this job is exhausting retries and accumulated failures exceed the max.
+        $isFinalAttempt = $this->attempts() >= $this->tries;
+        if ($config && $isFinalAttempt && $rateLimit->attempts >= $config->max_attempts) {
+            $rateLimit->is_blocked = true;
+            $rateLimit->reset_at = now()->addMinutes($config->block_duration_minutes);
+        }
+
+        $rateLimit->save();
     }
 
     /**

@@ -63,4 +63,13 @@ class Person extends Model
     {
         return $this->hasMany(GiftIdea::class);
     }
+
+    public function getChristmasDateForYear(int $year): string
+    {
+        $monthDay = $this->christmas_default_date
+            ?: $this->user?->getChristmasDefaultDate()
+            ?: config('reminders.christmas_default_date', '12-25');
+
+        return sprintf('%04d-%s', $year, $monthDay);
+    }
 }
