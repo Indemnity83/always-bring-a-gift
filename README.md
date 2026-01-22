@@ -23,6 +23,7 @@ Always Bring a Gift (ABAG) is a thoughtful gift-giving companion that helps you 
 - 💡 **Gift Ideas** - Save and organize gift ideas with Amazon integration
 - 📜 **Gift History** - Track what you've given and when
 - 🛍️ **Amazon Integration** - Fetch product images and details via OpenWeb Ninja API
+- 🔔 **Multi-Channel Reminders** - Email, Slack, Discord, or custom push webhooks
 - 🔐 **Secure Authentication** - Built-in 2FA support and optional Authentik SSO
 - 👨‍💼 **Admin Dashboard** - User management and system oversight
 - 🐳 **Easy Deployment** - Docker images for simple setup
@@ -99,6 +100,20 @@ php artisan serve
 ## Configuration
 
 The application works out-of-the-box with sensible defaults. Optional configuration is available for advanced use cases - see [DOCKER.md](DOCKER.md) for details.
+
+### Reminder Notifications
+
+Reminders are sent daily at `REMINDER_SEND_TIME` (defaults to 09:00) for events happening within `REMINDER_LEAD_TIME_DAYS` (defaults to 7). Configure channels via environment variables:
+
+- `REMINDER_MAIL_ENABLED=true|false`
+- `REMINDER_SLACK_WEBHOOK=https://hooks.slack.com/services/...`
+- `REMINDER_DISCORD_WEBHOOK=https://discord.com/api/webhooks/...`
+- `REMINDER_PUSH_ENDPOINT=https://your.push.endpoint/notify`
+- `REMINDER_PUSH_TOKEN=optional-token`
+
+Trigger manually with `php artisan reminders:send` or override the lookahead window: `php artisan reminders:send --days=3`.
+Per-user settings can be adjusted in-app under Settings → Notifications (lead time, send time, channels, webhook endpoints).
+Admins can set SMTP credentials in-app under Settings → Email (SMTP), which override default mail env values at runtime.
 
 ### First-Time Setup
 

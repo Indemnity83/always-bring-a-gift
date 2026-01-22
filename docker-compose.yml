@@ -28,10 +28,11 @@ services:
       - TZ=UTC
 
       - APP_NAME=Always Bring a Gift
-      - APP_ENV=production
+      - APP_ENV=local
       - APP_DEBUG=false
       - APP_URL=http://localhost:8000
       - APP_TIMEZONE=UTC
+      
 
       # Database (SQLite by default)
       - DB_CONNECTION=sqlite

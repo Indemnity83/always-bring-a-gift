@@ -43,7 +43,7 @@ test('can create gift with all fields', function () {
         'is_annual' => true,
     ]);
 
-    $file = UploadedFile::fake()->image('gift.jpg');
+    $file = UploadedFile::fake()->create('gift.jpg', 100, 'image/jpeg');
 
     Livewire::test(Create::class, ['event' => $event, 'year' => now()->year])
         ->set('title', 'Test Gift')
