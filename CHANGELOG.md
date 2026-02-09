@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1](https://github.com/Indemnity83/always-bring-a-gift/compare/v0.3.0...v0.3.1) (2026-02-09)
+
+
+### Miscellaneous Chores
+
+* bump @rollup/rollup-linux-x64-gnu from 4.53.4 to 4.54.0 ([#54](https://github.com/Indemnity83/always-bring-a-gift/issues/54)) ([a7319d3](https://github.com/Indemnity83/always-bring-a-gift/commit/a7319d324f8181f54866dec0c88cfcc94d2b5d62))
+* bump @rollup/rollup-linux-x64-gnu from 4.54.0 to 4.56.0 ([#73](https://github.com/Indemnity83/always-bring-a-gift/issues/73)) ([4c43f87](https://github.com/Indemnity83/always-bring-a-gift/commit/4c43f875810959b86ef3fddd4416c2382ad27ca4))
+* bump @rollup/rollup-linux-x64-gnu from 4.9.5 to 4.53.3 ([#39](https://github.com/Indemnity83/always-bring-a-gift/issues/39)) ([7da2cc0](https://github.com/Indemnity83/always-bring-a-gift/commit/7da2cc086bd62a3500ac857736d24d2be9efb0b9))
+* bump @tailwindcss/vite from 4.1.11 to 4.1.17 ([#44](https://github.com/Indemnity83/always-bring-a-gift/issues/44)) ([1629a6a](https://github.com/Indemnity83/always-bring-a-gift/commit/1629a6a4d3bfa3dd2fb6ba50229571531fa13568))
+* bump autoprefixer from 10.4.21 to 10.4.22 ([#41](https://github.com/Indemnity83/always-bring-a-gift/issues/41)) ([bf64f47](https://github.com/Indemnity83/always-bring-a-gift/commit/bf64f47e3156754031cf9471b97f33dceac6dca4))
+* bump axios from 1.13.2 to 1.13.3 ([#74](https://github.com/Indemnity83/always-bring-a-gift/issues/74)) ([245da3f](https://github.com/Indemnity83/always-bring-a-gift/commit/245da3f5dca8a3e6ff37a8c8a0d42c38eb413b88))
+* bump concurrently from 9.2.0 to 9.2.1 ([#42](https://github.com/Indemnity83/always-bring-a-gift/issues/42)) ([cfa71e8](https://github.com/Indemnity83/always-bring-a-gift/commit/cfa71e8e226c9cff5712bf5110f98673230e62a5))
+* bump laravel-vite-plugin from 2.0.0 to 2.0.1 ([#40](https://github.com/Indemnity83/always-bring-a-gift/issues/40)) ([08c70eb](https://github.com/Indemnity83/always-bring-a-gift/commit/08c70ebd1f233a7275b9553c2bf08a2ca830a171))
+* bump laravel-vite-plugin from 2.0.1 to 2.1.0 ([#76](https://github.com/Indemnity83/always-bring-a-gift/issues/76)) ([1ce57e9](https://github.com/Indemnity83/always-bring-a-gift/commit/1ce57e9c8439169bf53e0a181eb006b0ca6f08a0))
+* bump laravel/boost from 1.8.10 to 2.0.1 ([#75](https://github.com/Indemnity83/always-bring-a-gift/issues/75)) ([0cbf177](https://github.com/Indemnity83/always-bring-a-gift/commit/0cbf177dc4522637722615246f30731235ad515d))
+* bump laravel/boost from 1.8.3 to 1.8.5 ([#48](https://github.com/Indemnity83/always-bring-a-gift/issues/48)) ([7ac0a23](https://github.com/Indemnity83/always-bring-a-gift/commit/7ac0a236449a3c6a1319aa8870a1e3d866e2b852))
+* bump laravel/boost from 1.8.5 to 1.8.7 ([#59](https://github.com/Indemnity83/always-bring-a-gift/issues/59)) ([c08ed3d](https://github.com/Indemnity83/always-bring-a-gift/commit/c08ed3ded986dbf5ff4de28644c2f150c9677c8e))
+* bump laravel/boost from 1.8.7 to 1.8.9 ([#66](https://github.com/Indemnity83/always-bring-a-gift/issues/66)) ([362898e](https://github.com/Indemnity83/always-bring-a-gift/commit/362898efb8bd7a7d535799a6b17d8c5677c590c6))
+* bump laravel/boost from 1.8.9 to 1.8.10 ([#70](https://github.com/Indemnity83/always-bring-a-gift/issues/70)) ([0462029](https://github.com/Indemnity83/always-bring-a-gift/commit/0462029b1fc1b7beac2c4c1d1cb487b690ce737c))
+* bump laravel/boost from 2.0.1 to 2.0.5 ([#79](https://github.com/Indemnity83/always-bring-a-gift/issues/79)) ([73f2089](https://github.com/Indemnity83/always-bring-a-gift/commit/73f208985c3424818cee7bc18bfdd41d5744e493))
+* bump laravel/fortify from 1.32.1 to 1.33.0 ([#56](https://github.com/Indemnity83/always-bring-a-gift/issues/56)) ([347fb0f](https://github.com/Indemnity83/always-bring-a-gift/commit/347fb0fd8aa30a9406d694defba4561f4e443a45))
+* bump laravel/fortify from 1.33.0 to 1.34.0 ([#81](https://github.com/Indemnity83/always-bring-a-gift/issues/81)) ([e953d72](https://github.com/Indemnity83/always-bring-a-gift/commit/e953d72d6f38d74175162086c587c2db31854cbc))
+* bump laravel/framework from 12.41.1 to 12.42.0 ([#47](https://github.com/Indemnity83/always-bring-a-gift/issues/47)) ([efe2a23](https://github.com/Indemnity83/always-bring-a-gift/commit/efe2a23646d1dd1f477fe4a0eabf48428b8e4630))
+* bump laravel/framework from 12.42.0 to 12.44.0 ([#60](https://github.com/Indemnity83/always-bring-a-gift/issues/60)) ([1bbf851](https://github.com/Indemnity83/always-bring-a-gift/commit/1bbf851b0f4e4546f6261a4edb6aab978df1954b))
+* bump laravel/framework from 12.46.0 to 12.47.0 ([#68](https://github.com/Indemnity83/always-bring-a-gift/issues/68)) ([01200f9](https://github.com/Indemnity83/always-bring-a-gift/commit/01200f93d1ce020ac45729b62e37882019d30825))
+* bump laravel/framework from 12.47.0 to 12.48.1 ([#72](https://github.com/Indemnity83/always-bring-a-gift/issues/72)) ([8273949](https://github.com/Indemnity83/always-bring-a-gift/commit/8273949e66c9ba44fcadbca089097eca251b4e10))
+* bump laravel/pint from 1.26.0 to 1.27.0 ([#62](https://github.com/Indemnity83/always-bring-a-gift/issues/62)) ([1fa7b16](https://github.com/Indemnity83/always-bring-a-gift/commit/1fa7b1665a065b001d5c587671d4953c22f435fe))
+* bump laravel/sail from 1.50.0 to 1.51.0 ([#49](https://github.com/Indemnity83/always-bring-a-gift/issues/49)) ([dee3dc9](https://github.com/Indemnity83/always-bring-a-gift/commit/dee3dc9b2e636a069fda8eab124162846ca28d96))
+* bump laravel/sail from 1.51.0 to 1.52.0 ([#67](https://github.com/Indemnity83/always-bring-a-gift/issues/67)) ([62297c6](https://github.com/Indemnity83/always-bring-a-gift/commit/62297c68e973d00f10eb345e5ad1088963e92dbf))
+* bump laravel/tinker from 2.10.2 to 2.11.0 ([#61](https://github.com/Indemnity83/always-bring-a-gift/issues/61)) ([b602f29](https://github.com/Indemnity83/always-bring-a-gift/commit/b602f290ffd591d8a591fb87106b70904a14f736))
+* bump lightningcss-linux-x64-gnu from 1.30.2 to 1.31.1 ([#77](https://github.com/Indemnity83/always-bring-a-gift/issues/77)) ([5b06e5f](https://github.com/Indemnity83/always-bring-a-gift/commit/5b06e5fcb6a706b7a149ee2d87e4d03d8e634bd1))
+* bump livewire/flux from 2.9.1 to 2.10.2 ([#57](https://github.com/Indemnity83/always-bring-a-gift/issues/57)) ([bc66be3](https://github.com/Indemnity83/always-bring-a-gift/commit/bc66be3bcfc64b089eed768f495ab91417763142))
+* bump sabre/vobject from 4.5.7 to 4.5.8 ([#71](https://github.com/Indemnity83/always-bring-a-gift/issues/71)) ([884cee2](https://github.com/Indemnity83/always-bring-a-gift/commit/884cee2a97e2e2a3d209b6e167a32b8e0ca14e3b))
+* bump vite from 7.2.6 to 7.3.0 ([#55](https://github.com/Indemnity83/always-bring-a-gift/issues/55)) ([be3335e](https://github.com/Indemnity83/always-bring-a-gift/commit/be3335ece5f50ee9c4ec686d19fda6a8fe5717aa))
+* bump vite from 7.3.0 to 7.3.1 ([#64](https://github.com/Indemnity83/always-bring-a-gift/issues/64)) ([f982613](https://github.com/Indemnity83/always-bring-a-gift/commit/f9826138c4e58caf64088cf37c85e1c58b06a264))
+
 ## [0.3.0](https://github.com/Indemnity83/always-bring-a-gift/compare/v0.2.0...v0.3.0) (2025-12-05)
 
 
