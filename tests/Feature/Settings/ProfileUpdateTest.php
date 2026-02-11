@@ -74,3 +74,56 @@ test('correct password must be provided to delete account', function () {
 
     expect($user->fresh())->not->toBeNull();
 });
+
+test('timezone can be updated', function () {
+    $user = User::factory()->create(['timezone' => 'UTC']);
+
+    $this->actingAs($user);
+
+    $response = Livewire::test(Profile::class)
+        ->set('name', $user->name)
+        ->set('email', $user->email)
+        ->set('timezone', 'America/New_York')
+        ->call('updateProfileInformation');
+
+    $response->assertHasNoErrors();
+
+    expect($user->refresh()->timezone)->toEqual('America/New_York');
+});
+
+test('christmas default date can be updated', function () {
+    $user = User::factory()->create(['christmas_default_date' => '12-25']);
+
+    $this->actingAs($user);
+
+    $response = Livewire::test(Profile::class)
+        ->set('name', $user->name)
+        ->set('email', $user->email)
+        ->set('christmasMonth', 12)
+        ->set('christmasDay', 24)
+        ->call('updateProfileInformation');
+
+    $response->assertHasNoErrors();
+
+    expect($user->refresh()->christmas_default_date)->toEqual('12-24');
+});
+
+test('timezone must be valid', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    $response = Livewire::test(Profile::class)
+        ->set('name', $user->name)
+        ->set('email', $user->email)
+        ->set('timezone', 'Invalid/Timezone')
+        ->call('updateProfileInformation');
+
+    $response->assertHasErrors(['timezone']);
+});
+
+test('timezone defaults to UTC for new users', function () {
+    $user = User::factory()->create();
+
+    expect($user->getUserTimezone())->toEqual('UTC');
+});

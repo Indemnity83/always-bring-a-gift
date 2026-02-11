@@ -27,6 +27,39 @@
                 @endif
             </div>
 
+            <flux:select wire:model="timezone" :label="__('Timezone')" searchable placeholder="Select timezone..." required>
+                @foreach ($this->timezones as $tz => $displayName)
+                    <option value="{{ $tz }}">{{ $displayName }}</option>
+                @endforeach
+            </flux:select>
+            <flux:description class="-mt-4">{{ __('Used to determine when to send notifications based on your local time.') }}</flux:description>
+            @error('timezone')
+                <flux:text class="mt-2 text-sm text-red-600">{{ $message }}</flux:text>
+            @enderror
+
+            <div>
+                <flux:label>{{ __('Default Christmas date') }}</flux:label>
+                <div class="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <flux:select wire:model="christmasMonth" required>
+                        @foreach ($this->christmasMonths as $value => $label)
+                            <option value="{{ $value }}">{{ $label }}</option>
+                        @endforeach
+                    </flux:select>
+                    <flux:select wire:model="christmasDay" required>
+                        @foreach ($this->christmasDays as $value => $label)
+                            <option value="{{ $value }}">{{ $label }}</option>
+                        @endforeach
+                    </flux:select>
+                </div>
+                <flux:description class="mt-2">{{ __('Used when creating annual Christmas events.') }}</flux:description>
+                @error('christmasMonth')
+                    <flux:text class="mt-2 text-sm text-red-600">{{ $message }}</flux:text>
+                @enderror
+                @error('christmasDay')
+                    <flux:text class="mt-2 text-sm text-red-600">{{ $message }}</flux:text>
+                @enderror
+            </div>
+
             <div class="flex items-center gap-4">
                 <div class="flex items-center justify-end">
                     <flux:button variant="primary" type="submit" class="w-full">{{ __('Save') }}</flux:button>

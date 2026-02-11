@@ -21,6 +21,7 @@ class Show extends Component
     {
         $this->person = $person->load(['events.eventType', 'events.gifts', 'events.completions', 'giftIdeas']);
         $this->notes = $this->person->notes ?? '';
+
     }
 
     /**

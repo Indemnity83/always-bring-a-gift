@@ -19,7 +19,9 @@ test('can create person with name only', function () {
         ->call('save')
         ->assertHasNoErrors();
 
-    expect(Person::where('name', 'John Doe')->exists())->toBeTrue();
+    $person = Person::where('name', 'John Doe')->first();
+    expect($person)->not->toBeNull();
+    expect($person->user_id)->toBe($this->user->id);
 });
 
 test('can create person with birthday', function () {
@@ -109,6 +111,50 @@ test('can create person with christmas event', function () {
         ->and($event->eventType->name)->toBe('Christmas')
         ->and($event->is_annual)->toBeTrue()
         ->and($event->date->format('m-d'))->toBe('12-25');
+});
+
+test('uses user default christmas date when creating christmas events', function () {
+    EventType::factory()->create(['name' => 'Christmas']);
+
+    $this->user->update(['christmas_default_date' => '12-24']);
+
+    Livewire::test(Create::class)
+        ->set('name', 'Holiday Friend')
+        ->set('create_christmas_event', true)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $person = Person::where('name', 'Holiday Friend')->first();
+    expect($person)->not->toBeNull();
+
+    $event = Event::where('person_id', $person->id)->first();
+    expect($event)
+        ->not->toBeNull()
+        ->and($event->eventType->name)->toBe('Christmas')
+        ->and($event->date->format('m-d'))->toBe('12-24');
+});
+
+test('can override christmas date when creating a person', function () {
+    EventType::factory()->create(['name' => 'Christmas']);
+
+    $this->user->update(['christmas_default_date' => '12-25']);
+
+    Livewire::test(Create::class)
+        ->set('name', 'Override Friend')
+        ->set('create_christmas_event', true)
+        ->set('christmas_month', 12)
+        ->set('christmas_day', 24)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $person = Person::where('name', 'Override Friend')->first();
+    expect($person)->not->toBeNull();
+
+    $event = Event::where('person_id', $person->id)->first();
+    expect($event)
+        ->not->toBeNull()
+        ->and($event->eventType->name)->toBe('Christmas')
+        ->and($event->date->format('m-d'))->toBe('12-24');
 });
 
 test('can create person with both birthday and christmas events', function () {

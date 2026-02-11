@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class EventType extends Model
 {
+    public const CHRISTMAS_NAME = 'Christmas';
+
     /** @use HasFactory<\Database\Factories\EventTypeFactory> */
     use HasFactory;
 

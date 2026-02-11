@@ -5,6 +5,8 @@ namespace App\Livewire\People;
 use App\Models\Event;
 use App\Models\EventType;
 use App\Models\Person;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -32,7 +34,23 @@ class Create extends Component
 
     public string $christmas_target_value = '';
 
+    public int $christmas_month = 12;
+
+    public int $christmas_day = 25;
+
     public string $notes = '';
+
+    public function mount(): void
+    {
+        $user = Auth::user();
+        $monthDay = $user instanceof User
+            ? $user->getChristmasDefaultDate()
+            : config('reminders.christmas_default_date', '12-25');
+
+        $parts = explode('-', $monthDay);
+        $this->christmas_month = isset($parts[0]) ? (int) $parts[0] : 12;
+        $this->christmas_day = isset($parts[1]) ? (int) $parts[1] : 25;
+    }
 
     /**
      * Save the person
@@ -50,6 +68,17 @@ class Create extends Component
             'anniversary_target_value' => ['nullable', 'numeric', 'min:0'],
             'create_christmas_event' => ['boolean'],
             'christmas_target_value' => ['nullable', 'numeric', 'min:0'],
+            'christmas_month' => ['required', 'integer', 'between:1,12'],
+            'christmas_day' => [
+                'required',
+                'integer',
+                'between:1,31',
+                function (string $attribute, int $value, \Closure $fail) {
+                    if (! checkdate((int) $this->christmas_month, $value, 2000)) {
+                        $fail('The christmas day is invalid for the selected month.');
+                    }
+                },
+            ],
             'notes' => ['nullable', 'string', 'max:5000'],
         ]);
 
@@ -59,10 +88,12 @@ class Create extends Component
         }
 
         $person = Person::create([
+            'user_id' => Auth::id(),
             'name' => $validated['name'],
             'profile_picture' => $profilePicturePath,
             'birthday' => $validated['birthday'],
             'anniversary' => $validated['anniversary'],
+            'christmas_default_date' => $this->formatChristmasMonthDay($validated),
             'notes' => $validated['notes'],
         ]);
 
@@ -98,13 +129,13 @@ class Create extends Component
 
         // Create Christmas event if requested
         if ($validated['create_christmas_event']) {
-            $christmasType = EventType::where('name', 'Christmas')->first();
+            $christmasType = EventType::where('name', EventType::CHRISTMAS_NAME)->first();
             if ($christmasType) {
                 Event::create([
                     'person_id' => $person->id,
                     'event_type_id' => $christmasType->id,
                     'is_annual' => true,
-                    'date' => now()->year.'-12-25',
+                    'date' => $this->resolveChristmasDateForPerson($person),
                     'budget' => $validated['christmas_target_value'] ?: null,
                 ]);
             }
@@ -118,5 +149,24 @@ class Create extends Component
     public function render()
     {
         return view('livewire.people.create');
+    }
+
+    /**
+     * Resolve the Christmas date for the given person.
+     */
+    protected function resolveChristmasDateForPerson(Person $person): string
+    {
+        $year = now()->year;
+        return $person->getChristmasDateForYear($year);
+    }
+
+    /**
+     * Format the Christmas month/day for storage.
+     *
+     * @param  array<string, mixed>  $validated
+     */
+    protected function formatChristmasMonthDay(array $validated): string
+    {
+        return sprintf('%02d-%02d', $validated['christmas_month'], $validated['christmas_day']);
     }
 }
