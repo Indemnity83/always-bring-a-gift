@@ -3,6 +3,8 @@
 use App\Livewire\Dashboard;
 use App\Livewire\People;
 use App\Livewire\Settings\Appearance;
+use App\Livewire\Settings\Mail;
+use App\Livewire\Settings\Notifications;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\TwoFactor;
@@ -45,6 +47,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/profile', Profile::class)->name('profile.edit');
     Route::get('settings/password', Password::class)->name('user-password.edit');
     Route::get('settings/appearance', Appearance::class)->name('appearance.edit');
+    Route::get('settings/notifications', Notifications::class)->name('notifications.edit');
+    Route::get('settings/mail', Mail::class)->middleware('can:viewAdmin,App\Models\User')->name('mail.edit');
 
     // Admin routes
     Route::middleware('can:viewAdmin,App\Models\User')->prefix('admin')->name('admin.')->group(function () {

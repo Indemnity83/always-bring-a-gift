@@ -9,12 +9,16 @@ public/hot
 .env
 .env.*
 !.env.example
+tests
+phpunit.xml
 storage/*.key
 storage/logs
 storage/framework/cache
 storage/framework/sessions
 storage/framework/testing
 storage/framework/views
+storage/app/private
+storage/app/livewire-tmp
 storage/app/public/*
 !storage/app/public/.gitignore
 .phpunit.result.cache
@@ -29,10 +33,8 @@ Thumbs.db
 *.swp
 *.swo
 *~
-tests
 .editorconfig
 .styleci.yml
-phpunit.xml
 docker-compose.yml
 README.md
 DOCKER.md
