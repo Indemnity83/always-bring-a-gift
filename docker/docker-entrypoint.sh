@@ -3,7 +3,41 @@ set -e
 
 echo "🚀 Starting Always Bring a Gift (ABAG) container..."
 
-# Ensure storage directory structure exists
+# Handle PUID/PGID for Unraid and similar systems (set early for correct ownership)
+PUID=${PUID:-1000}
+PGID=${PGID:-1000}
+
+# Ensure user/group exist for gosu
+if ! getent group "$PGID" >/dev/null 2>&1; then
+    groupadd -g "$PGID" abag
+fi
+
+if ! id -u "$PUID" >/dev/null 2>&1; then
+    useradd -u "$PUID" -g "$PGID" -m -s /bin/sh abag
+fi
+
+RUN_USER=$(getent passwd "$PUID" | cut -d: -f1)
+RUN_USER=${RUN_USER:-abag}
+
+# Graceful shutdown for background workers
+shutdown() {
+    echo "🛑 Shutting down background processes..."
+    if [ -n "${scheduler_pid:-}" ]; then
+        kill "$scheduler_pid" 2>/dev/null || true
+    fi
+    if [ -n "${worker_pid:-}" ]; then
+        kill "$worker_pid" 2>/dev/null || true
+    fi
+    if [ -n "${server_pid:-}" ]; then
+        kill "$server_pid" 2>/dev/null || true
+    fi
+    wait || true
+    exit 0
+}
+
+trap shutdown INT TERM
+
+# Ensure storage directory structure exists with correct ownership
 echo "📁 Ensuring storage directory structure..."
 mkdir -p storage/app/public
 mkdir -p storage/framework/cache/data
@@ -12,6 +46,11 @@ mkdir -p storage/framework/testing
 mkdir -p storage/framework/views
 mkdir -p storage/logs
 mkdir -p storage/caddy
+
+# Set permissions early so log files created during setup are writable
+echo "🔒 Setting storage permissions..."
+chown -R "$PUID:$PGID" storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache
 
 echo "💻 Setup Environment:"
 php artisan config:clear --quiet
@@ -31,11 +70,31 @@ if [ ! -f .env ]; then
     cp .env.example .env
 fi
 
+# If APP_KEY is provided via env, ensure it is persisted into .env before generation attempts
+if [ -n "$APP_KEY" ]; then
+    if grep -qE '^APP_KEY=' .env; then
+        sed -i "s/^APP_KEY=.*/APP_KEY=${APP_KEY}/" .env
+    else
+        echo "APP_KEY=${APP_KEY}" >> .env
+    fi
+fi
+
 # Generate app key if not set
 APP_KEY_VALUE=$(grep -E '^APP_KEY=' .env | cut -d '=' -f 2-)
 if [ -z "$APP_KEY_VALUE" ]; then
     echo "🔑 Generating application key..."
-    php artisan key:generate --force
+    php artisan key:generate --force || true
+
+    APP_KEY_VALUE=$(grep -E '^APP_KEY=' .env | cut -d '=' -f 2-)
+    if [ -z "$APP_KEY_VALUE" ]; then
+        echo "⚠️ Artisan key:generate failed, generating a key manually..."
+        GENERATED_KEY=$(php -r "echo 'base64:'.base64_encode(random_bytes(32));")
+        if grep -qE '^APP_KEY=' .env; then
+            sed -i "s/^APP_KEY=.*/APP_KEY=${GENERATED_KEY}/" .env
+        else
+            echo "APP_KEY=${GENERATED_KEY}" >> .env
+        fi
+    fi
 fi
 
 # Create SQLite database file
@@ -71,24 +130,41 @@ fi
 echo "✨ Optimizing application..."
 php artisan optimize
 
-# Handle PUID/PGID for Unraid and similar systems
-PUID=${PUID:-1000}
-PGID=${PGID:-1000}
+# Final permission check (in case new files were created during setup)
+echo "🔒 Final permission check..."
+chown -R "$PUID:$PGID" storage bootstrap/cache
+find storage -type d -exec chmod 775 {} \;
+find storage -type f -exec chmod 664 {} \;
+find bootstrap/cache -type d -exec chmod 775 {} \;
+find bootstrap/cache -type f -exec chmod 664 {} \;
 
-# Set ownership to the configured user
-echo "🔒 Fixing ownership on writable dirs for $PUID:$PGID..."
-for path in storage bootstrap/cache; do
-  if [ -d "$path" ]; then
-    # Only touch entries that don't already match PUID/PGID
-    find "$path" \( ! -user "$PUID" -o ! -group "$PGID" \) -exec chown "$PUID:$PGID" {} +
-  fi
-done
-
-echo "🔒 Ensuring permissions for writable dirs..."
-find storage bootstrap/cache -type d -exec chmod 775 {} \;
-find storage bootstrap/cache -type f -exec chmod 664 {} \;
+# Ensure log files are writable by group
+chmod 666 storage/logs/*.log 2>/dev/null || true
 
 echo "✅ Application ready!"
 
+# Start Laravel scheduler in background as the configured user
+(
+  echo "⏱️  Starting scheduler loop..."
+  while true; do
+    gosu "$RUN_USER:$PGID" php artisan schedule:run --no-ansi --quiet || true
+    sleep 60
+  done
+) &
+scheduler_pid=$!
+
+# Start queue worker in background for processing notifications (with restart loop)
+(
+  echo "📬 Starting queue worker..."
+  while true; do
+    gosu "$RUN_USER:$PGID" php artisan queue:work --queue=notifications --sleep=3 --tries=3 --max-time=3600 || true
+    echo "📬 Queue worker restarting..."
+    sleep 5
+  done
+) &
+worker_pid=$!
+
 # Start FrankenPHP server as the configured user with Caddyfile
-exec gosu "$PUID:$PGID" frankenphp run --config /etc/caddy/Caddyfile
+gosu "$RUN_USER:$PGID" frankenphp run --config /etc/caddy/Caddyfile &
+server_pid=$!
+wait "$server_pid"
