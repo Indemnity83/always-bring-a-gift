@@ -3,17 +3,30 @@ FROM composer:2 AS php-builder
 
 WORKDIR /app
 
+ARG INCLUDE_DEV=false
+
 # Copy composer files
 COPY composer.json composer.lock ./
 
-# Install dependencies (with cache mount for faster rebuilds)
+# Install dependencies (optionally include dev tools for testing images)
 RUN --mount=type=cache,target=/tmp/cache \
-    COMPOSER_CACHE_DIR=/tmp/cache composer install \
-    --no-dev \
-    --optimize-autoloader \
-    --no-interaction \
-    --prefer-dist \
-    --no-scripts
+    if [ "$INCLUDE_DEV" = "true" ]; then \
+        # Dev builds: ignore PHP platform reqs to allow flexible test environments \
+        composer install \
+        --optimize-autoloader \
+        --no-interaction \
+        --prefer-dist \
+        --no-scripts \
+        --ignore-platform-req=php; \
+    else \
+        # Production builds: enforce all platform requirements \
+        composer install \
+        --no-dev \
+        --optimize-autoloader \
+        --no-interaction \
+        --prefer-dist \
+        --no-scripts; \
+    fi
 
 # Stage 2: Build frontend assets
 FROM node:20-alpine AS frontend-builder
@@ -23,7 +36,7 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies (with cache mount for faster rebuilds)
+# Install dependencies
 RUN --mount=type=cache,target=/root/.npm \
     npm ci
 

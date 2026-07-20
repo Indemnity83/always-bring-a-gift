@@ -54,7 +54,7 @@ test('can update gift with all fields', function () {
         'title' => 'Original Gift',
     ]);
 
-    $file = UploadedFile::fake()->image('updated-gift.jpg');
+    $file = UploadedFile::fake()->create('updated-gift.jpg', 100, 'image/jpeg');
 
     Livewire::test(Edit::class, ['gift' => $gift])
         ->set('title', 'Updated Gift')
@@ -83,7 +83,7 @@ test('can update gift without changing image', function () {
         'is_annual' => true,
     ]);
 
-    $originalImage = UploadedFile::fake()->image('original.jpg');
+    $originalImage = UploadedFile::fake()->create('original.jpg', 100, 'image/jpeg');
     $imagePath = $originalImage->store('gifts', 'public');
 
     $gift = Gift::factory()->create([
@@ -113,7 +113,7 @@ test('can replace existing image', function () {
         'is_annual' => true,
     ]);
 
-    $originalImage = UploadedFile::fake()->image('original.jpg');
+    $originalImage = UploadedFile::fake()->create('original.jpg', 100, 'image/jpeg');
     $originalPath = $originalImage->store('gifts', 'public');
 
     $gift = Gift::factory()->create([
@@ -123,7 +123,7 @@ test('can replace existing image', function () {
         'image_path' => $originalPath,
     ]);
 
-    $newImage = UploadedFile::fake()->image('new.jpg');
+    $newImage = UploadedFile::fake()->create('new.jpg', 100, 'image/jpeg');
 
     Livewire::test(Edit::class, ['gift' => $gift])
         ->set('image', $newImage)
